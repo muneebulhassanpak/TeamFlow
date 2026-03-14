@@ -2,7 +2,8 @@
 
 import * as React from 'react'
 import { usePathname } from 'next/navigation'
-import { LogOut, Loader2 } from 'lucide-react'
+import { LogOut, Loader2, Sun, Moon } from 'lucide-react'
+import { useTheme } from 'next-themes'
 
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -44,6 +45,7 @@ export function Navbar({ userId }: NavbarProps) {
   const { org } = useOrg()
   const currentPage = useBreadcrumb()
   const signout = useSignout()
+  const { theme, setTheme } = useTheme()
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 px-4">
@@ -69,6 +71,17 @@ export function Navbar({ userId }: NavbarProps) {
       <div className="flex-1" />
 
       <NotificationBell userId={userId} />
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className="size-8"
+        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        aria-label="Toggle theme"
+      >
+        <Sun className="size-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+        <Moon className="absolute size-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      </Button>
 
       <Button
         variant="outline"
