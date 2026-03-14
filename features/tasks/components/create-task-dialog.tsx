@@ -1,9 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, Plus } from "lucide-react"
+import { Plus } from "lucide-react"
+import { Loader2 } from "lucide-react"
 
 import {
   Dialog,
@@ -32,14 +30,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { toast } from "sonner"
 
-import { useCreateTask } from "../hooks/use-tasks"
-import { useProjectMembers } from "@/features/projects/hooks/use-projects"
-import { CreateTaskSchema } from "../validations/tasks"
-import { z } from "zod"
-
-type CreateTaskFormValues = z.input<typeof CreateTaskSchema>
+import { useCreateTaskDialog } from "../hooks/use-create-task-dialog"
 
 interface CreateTaskDialogProps {
   projectId: string
@@ -47,46 +39,16 @@ interface CreateTaskDialogProps {
   defaultStatus?: "todo" | "in_progress" | "in_review" | "done"
 }
 
-export function CreateTaskDialog(props: CreateTaskDialogProps) {
-  const { projectId, children } = props
-  const [open, setOpen] = useState(false)
-
-  const { mutateAsync: createTask } = useCreateTask(projectId)
-  const { data: members, isLoading: isLoadingMembers } = useProjectMembers(projectId)
-
-  const form = useForm<CreateTaskFormValues>({
-    resolver: zodResolver(CreateTaskSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      priority: "medium",
-      status: props.defaultStatus ?? "todo",
-      assignee_id: undefined,
-      due_date: undefined,
-    },
-  })
-
-  async function onSubmit(data: CreateTaskFormValues) {
-    // Convert empty string/undefined wrapper to null for database
-    const payload = {
-      ...data,
-      priority: data.priority ?? "medium",
-      status: data.status ?? "todo",
-      assignee_id: data.assignee_id === "unassigned" ? null : (data.assignee_id || null),
-      due_date: data.due_date || null
-    }
-
-    try {
-      await createTask(payload)
-      toast.success("Task created successfully")
-      setOpen(false)
-      form.reset()
-    } catch (err: Error | unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to create task")
-    }
-  }
-
-  const isSubmitting = form.formState.isSubmitting
+export function CreateTaskDialog({ projectId, children, defaultStatus }: CreateTaskDialogProps) {
+  const {
+    open,
+    setOpen,
+    form,
+    members,
+    isLoadingMembers,
+    isSubmitting,
+    onSubmit,
+  } = useCreateTaskDialog({ projectId, defaultStatus })
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -229,7 +191,6 @@ export function CreateTaskDialog(props: CreateTaskDialogProps) {
                   <FormItem>
                     <FormLabel>Due Date</FormLabel>
                     <FormControl>
-                      {/* Using native date input for simplicity. A calendar picker is better but this is MVP */}
                       <Input type="date" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />

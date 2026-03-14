@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { format } from "date-fns"
 import { TaskRow } from "../hooks/use-tasks"
 import {
@@ -14,8 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { CalendarIcon, Clock, Flag, CheckCircle2, User, LayoutList, Maximize, Minimize, Edit2, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { priorityConfig, statusLabels } from "../utils"
-import { useDeleteTask } from "../hooks/use-tasks"
-import { toast } from "sonner"
+import { useTaskDetailsDialog } from "../hooks/use-task-details-dialog"
 import { EditTaskDialog } from "./edit-task-dialog"
 
 interface TaskDetailsDialogProps {
@@ -25,34 +23,16 @@ interface TaskDetailsDialogProps {
 }
 
 export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialogProps) {
-  const [isExpanded, setIsExpanded] = useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const { mutateAsync: deleteTask } = useDeleteTask(task?.project_id || "")
+  const {
+    isExpanded,
+    setIsExpanded,
+    isEditDialogOpen,
+    setIsEditDialogOpen,
+    initials,
+    handleDelete,
+  } = useTaskDetailsDialog({ task, onOpenChange })
 
   if (!task) return null
-
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this task? This action cannot be undone.")) {
-      return
-    }
-
-    try {
-      await deleteTask(task.id)
-      toast.success("Task deleted successfully")
-      onOpenChange(false)
-    } catch (_error) {
-      toast.error("Failed to delete task")
-    }
-  }
-
-  const initials = task.assignee?.full_name
-    ? task.assignee.full_name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2)
-    : task.assignee?.email.charAt(0).toUpperCase() ?? "?"
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -85,10 +65,10 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-transparent flex items-center justify-center p-1.5 hover:bg-muted text-muted-foreground"
-            title={isExpanded ? 'Collapse' : 'Expand'}
+            title={isExpanded ? "Collapse" : "Expand"}
           >
             {isExpanded ? <Minimize className="size-3.5" /> : <Maximize className="size-3.5" />}
-            <span className="sr-only">{isExpanded ? 'Collapse' : 'Expand'}</span>
+            <span className="sr-only">{isExpanded ? "Collapse" : "Expand"}</span>
           </button>
         </div>
 

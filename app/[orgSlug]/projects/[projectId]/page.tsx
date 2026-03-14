@@ -45,7 +45,7 @@ export default async function ProjectPage({
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] p-6">
+    <div className="h-[calc(100vh-4rem)] p-6 pr-0">
       <ProjectBoardView projectId={project.id} projectName={project.name} />
     </div>
   )
