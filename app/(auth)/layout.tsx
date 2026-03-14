@@ -36,9 +36,9 @@ export default async function AuthLayout({
       {/* Decorative circles — top-right corner, desktop only */}
       <div className="pointer-events-none absolute inset-0 hidden overflow-hidden md:block">
         {/* Outer large circle */}
-        <div className="absolute top-0 right-0 h-[500px] w-[500px] translate-x-1/2 -translate-y-1/2 rounded-full bg-white/10" />
+        <div className="absolute top-0 right-0 h-125 w-125 translate-x-1/2 -translate-y-1/2 rounded-full bg-white/10" />
         {/* Inner smaller circle */}
-        <div className="absolute top-0 right-0 h-[160px] w-[160px] translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground dark:bg-background" />
+        <div className="absolute top-0 right-0 h-40 w-40 translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground dark:bg-background" />
       </div>
       <div className="relative w-full max-w-md">{children}</div>
     </div>
