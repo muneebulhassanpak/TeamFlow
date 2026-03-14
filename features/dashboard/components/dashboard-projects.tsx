@@ -1,9 +1,10 @@
 "use client"
 
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, FolderOpen } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { useOrg } from '@/features/app-shell/context/org-context'
 import { useProjects } from '@/features/projects/hooks/use-projects'
 
@@ -35,7 +36,14 @@ export function DashboardProjects() {
             ))}
           </div>
         ) : projects.length === 0 ? (
-          <p className="py-6 text-center text-sm text-muted-foreground">No active projects yet.</p>
+          <Empty className="border-0 py-4 md:py-4">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <FolderOpen />
+              </EmptyMedia>
+              <EmptyTitle>No active projects</EmptyTitle>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <ul className="space-y-3">
             {projects.map((p) => (

@@ -1,6 +1,7 @@
 "use client"
 
 import { Search, Users } from "lucide-react"
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "@/components/ui/empty"
 import { getMemberInitial } from "@/features/projects/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -67,14 +68,17 @@ export function CreateProjectStep2({
           ))}
         </div>
       ) : members.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 py-8 text-center text-muted-foreground">
-          <Users className="size-8 opacity-40" />
-          <p className="text-sm">
-            {search
-              ? "No members match your search."
-              : "No other members in your organisation yet."}
-          </p>
-        </div>
+        <Empty className="border-0 py-4 md:py-4">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Users />
+            </EmptyMedia>
+            <EmptyTitle>{search ? "No members found" : "No members yet"}</EmptyTitle>
+            <EmptyDescription>
+              {search ? "Try a different search." : "Invite members to your workspace first."}
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <div className="max-h-60 overflow-y-auto space-y-1 pr-1">
           {members.map((member) => {
