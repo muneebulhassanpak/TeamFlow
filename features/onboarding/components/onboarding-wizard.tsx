@@ -60,7 +60,7 @@ export function OnboardingWizard({ prefillName }: OnboardingWizardProps) {
             data={{ ...profileData, ...orgData }}
             onSubmit={handleSubmit}
             onBack={() => setStep(2)}
-            isPending={complete.isPending}
+            isPending={complete.isPending || complete.isSuccess}
             error={complete.error?.message ?? null}
           />
         )}
