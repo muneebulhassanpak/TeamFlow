@@ -114,13 +114,13 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
               <DialogTitle className="text-2xl font-semibold leading-snug tracking-tight text-foreground">{task.title}</DialogTitle>
             </div>
 
-            <div className="space-y-4">
+            <div>
               {task.description ? (
-                <div className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap bg-primary/5 p-4 rounded-lg border border-primary/10">
+                <div className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
                   {task.description}
                 </div>
               ) : (
-                <div className="text-sm text-muted-foreground italic px-4 py-3 bg-muted/30 rounded-lg border border-dashed border-muted-foreground/30">
+                <div className="text-sm text-muted-foreground italic">
                   No description provided.
                 </div>
               )}
