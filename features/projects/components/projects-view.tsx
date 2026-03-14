@@ -71,22 +71,14 @@ export function ProjectsView() {
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Projects</h1>
-          <p className="text-sm text-muted-foreground">
-            {total} {total === 1 ? "project" : "projects"} in {org.name}
-          </p>
-        </div>
-        <CreateProjectDialog>
-          <Button className="shrink-0">
-            <Plus className="size-4" />
-            New Project
-          </Button>
-        </CreateProjectDialog>
+      <div>
+        <h1 className="text-2xl font-semibold">Projects</h1>
+        <p className="text-sm text-muted-foreground">
+          {total} {total === 1 ? "project" : "projects"} in {org.name}
+        </p>
       </div>
 
-      {/* Search */}
+      {/* Search + actions */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative w-full sm:w-60">
           <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -99,6 +91,15 @@ export function ProjectsView() {
               if (page !== 1) setPage(1)
             }}
           />
+        </div>
+
+        <div className="ml-auto">
+          <CreateProjectDialog>
+            <Button className="shrink-0">
+              <Plus className="size-4" />
+              New Project
+            </Button>
+          </CreateProjectDialog>
         </div>
       </div>
 
