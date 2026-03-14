@@ -29,11 +29,13 @@ const COLUMNS: { id: ColumnType; title: string }[] = [
 ]
 
 interface KanbanBoardProps {
+  projectId: string
   tasks: TaskRow[]
   onReorder: (tasks: TaskRow[]) => void
 }
 
 export function KanbanBoard({
+  projectId,
   tasks: initialTasks,
   onReorder,
 }: KanbanBoardProps) {
@@ -165,6 +167,7 @@ export function KanbanBoard({
         {COLUMNS.map((col) => (
           <KanbanColumn
             key={col.id}
+            projectId={projectId}
             id={col.id}
             title={col.title}
             tasks={tasks.filter((t) => t.status === col.id)}

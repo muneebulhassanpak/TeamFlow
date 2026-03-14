@@ -44,12 +44,11 @@ type CreateTaskFormValues = z.input<typeof CreateTaskSchema>
 interface CreateTaskDialogProps {
   projectId: string
   children?: React.ReactNode
+  defaultStatus?: "todo" | "in_progress" | "in_review" | "done"
 }
 
-export function CreateTaskDialog({
-  projectId,
-  children,
-}: CreateTaskDialogProps) {
+export function CreateTaskDialog(props: CreateTaskDialogProps) {
+  const { projectId, children } = props
   const [open, setOpen] = useState(false)
   
   const { mutateAsync: createTask } = useCreateTask(projectId)
@@ -61,7 +60,7 @@ export function CreateTaskDialog({
       title: "",
       description: "",
       priority: "medium",
-      status: "todo",
+      status: props.defaultStatus ?? "todo",
       assignee_id: undefined,
       due_date: undefined,
     },

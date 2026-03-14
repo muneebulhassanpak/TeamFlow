@@ -72,6 +72,7 @@ export function ProjectBoardView({ projectId, projectName }: ProjectBoardViewPro
           </div>
         ) : (
           <KanbanBoard 
+            projectId={projectId}
             tasks={tasks} 
             onReorder={(tasks) => reorderTasks({ 
               tasks: tasks.map(t => ({ id: t.id, status: t.status, position: t.position })) 
