@@ -226,9 +226,9 @@ function HeroSection() {
       />
       {/* Colour orbs */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
-        <div className="absolute -right-40 top-20 h-[400px] w-[400px] rounded-full bg-violet-500/8 blur-[100px]" />
-        <div className="absolute bottom-0 left-1/2 h-[300px] w-[600px] -translate-x-1/2 rounded-full bg-primary/5 blur-[80px]" />
+        <div className="absolute -left-40 top-0 h-125 w-125 rounded-full bg-primary/10 blur-[120px]" />
+        <div className="absolute -right-40 top-20 h-100 w-100 rounded-full bg-violet-500/8 blur-[100px]" />
+        <div className="absolute bottom-0 left-1/2 h-75 w-150 -translate-x-1/2 rounded-full bg-primary/5 blur-[80px]" />
       </div>
 
       <div className="mx-auto max-w-5xl px-6 text-center">
@@ -525,7 +525,7 @@ function FeaturesSection() {
                   <div
                     className={`mb-3 flex size-10 items-center justify-center rounded-xl ${feature.bg} ${feature.accent}`}
                   >
-                    <feature.icon className="size-4.5" />
+                    <feature.icon className="size-5" />
                   </div>
                   <CardTitle className="text-base">{feature.title}</CardTitle>
                   <CardDescription className="text-sm leading-relaxed">
