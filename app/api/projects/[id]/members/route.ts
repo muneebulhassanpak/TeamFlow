@@ -38,44 +38,32 @@ export async function GET(
   // Get project members with profile info
   const { data: projectMembers, error: membersError } = await supabase
     .from("project_members")
-    .select(
-      `
-      id,
-      user_id,
-      is_manager,
-      added_at,
-      profiles(id, full_name, avatar_url)
-    `
-    )
+    .select("id, user_id, is_manager, added_at, profiles ( id, full_name, avatar_url )")
     .eq("project_id", projectId)
 
   if (membersError)
     return NextResponse.json({ error: membersError.message }, { status: 500 })
 
-  // Get emails from auth
-  const userIds = projectMembers?.map((m) => m.user_id) ?? []
+  // Fetch emails from auth.users (not stored in the profiles table)
+  const userIds = (projectMembers ?? []).map((m) => m.user_id)
   const { data: authUsers } = await supabase.auth.admin.listUsers({
     perPage: 1000,
   })
   const emailMap = Object.fromEntries(
     (authUsers?.users ?? [])
       .filter((u) => userIds.includes(u.id))
-      .map((u) => [u.id, u.email])
+      .map((u) => [u.id, u.email ?? ""])
   )
 
-  const members =
-    projectMembers?.map((m) => ({
-      id: m.id,
-      user_id: m.user_id,
-      is_manager: m.is_manager,
-      added_at: m.added_at,
-      email: emailMap[m.user_id] ?? "",
-      full_name:
-        (m.profiles as { full_name: string | null } | null)?.full_name ?? null,
-      avatar_url:
-        (m.profiles as { avatar_url: string | null } | null)?.avatar_url ??
-        null,
-    })) ?? []
+  const members = (projectMembers ?? []).map((m) => ({
+    id: m.id,
+    user_id: m.user_id,
+    is_manager: m.is_manager,
+    added_at: m.added_at,
+    email: emailMap[m.user_id] ?? "",
+    full_name: m.profiles?.full_name ?? null,
+    avatar_url: m.profiles?.avatar_url ?? null,
+  }))
 
   return NextResponse.json({ data: members })
 }

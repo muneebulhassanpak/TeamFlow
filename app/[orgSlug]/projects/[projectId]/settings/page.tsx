@@ -2,39 +2,25 @@ import { Suspense } from "react"
 import { getAuthUser, requireOrgMember } from "@/lib/auth"
 import { createServiceClient } from "@/lib/supabase/server"
 import { ProjectSettingsView } from "@/features/projects/components/project-settings-view"
+import { hasProfile } from "@/features/projects/types"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface ProjectSettingsPageProps {
   params: Promise<{ orgSlug: string; projectId: string }>
 }
 
-async function ProjectSettingsContent({
-  projectId,
-}: {
-  projectId: string
-}) {
+async function ProjectSettingsContent({ projectId }: { projectId: string }) {
   // 1. Auth guard
   const { user, error } = await getAuthUser()
   if (error || !user) throw new Error("Unauthorized")
 
-  // 2. Get project and check org membership
   const supabase = createServiceClient()
+
+  // 2. Fetch project with explicit columns — inferred via QueryData in features/projects/types.ts
   const { data: project, error: projectError } = await supabase
     .from("projects")
     .select(
-      `
-      *,
-      project_members (
-        user_id,
-        is_manager,
-        profiles (
-          id,
-          email,
-          full_name,
-          avatar_url
-        )
-      )
-    `
+      "id, name, description, color, org_id, archived, created_at, updated_at, project_members ( user_id, is_manager, profiles ( id, full_name, avatar_url ) )"
     )
     .eq("id", projectId)
     .single()
@@ -47,39 +33,43 @@ async function ProjectSettingsContent({
   )
   if (memberError || !member) throw new Error("Unauthorized")
 
-  // 3. Get available org members for adding to project
-  const { data: orgMembers, error: orgMembersError } = await supabase
+  // 3. Fetch org members available to add to this project
+  const { data: orgMembersData, error: orgMembersError } = await supabase
     .from("org_members")
-    .select(
-      `
-      user_id,
-      role,
-      profiles (
-        id,
-        email,
-        full_name,
-        avatar_url
-      )
-    `
-    )
+    .select("user_id, role, profiles ( id, full_name, avatar_url )")
     .eq("org_id", project.org_id)
 
   if (orgMembersError) throw new Error("Failed to load organization members")
+
+  // 4. Fetch emails from auth.users (email is not stored in the profiles table)
+  const allUserIds = [
+    ...(project.project_members ?? []).map((m) => m.user_id),
+    ...(orgMembersData ?? []).map((m) => m.user_id),
+  ]
+  const { data: authUsers } = await supabase.auth.admin.listUsers({
+    perPage: 1000,
+  })
+  const emailMap = Object.fromEntries(
+    (authUsers?.users ?? [])
+      .filter((u) => allUserIds.includes(u.id))
+      .map((u) => [u.id, u.email ?? ""])
+  )
+
+  // 5. Filter out null profiles and merge in email
+  const projectMembers = (project.project_members ?? [])
+    .filter(hasProfile)
+    .map((m) => ({ ...m, email: emailMap[m.user_id] ?? "" }))
+
+  const orgMembers = (orgMembersData ?? [])
+    .filter(hasProfile)
+    .map((m) => ({ ...m, email: emailMap[m.user_id] ?? "" }))
 
   return (
     <ProjectSettingsView
       orgId={project.org_id}
       project={project}
-      projectMembers={
-        (project.project_members ?? []) as unknown as Parameters<
-          typeof ProjectSettingsView
-        >[0]["projectMembers"]
-      }
-      orgMembers={
-        (orgMembers ?? []) as unknown as Parameters<
-          typeof ProjectSettingsView
-        >[0]["orgMembers"]
-      }
+      projectMembers={projectMembers}
+      orgMembers={orgMembers}
       currentUserRole={member.role}
     />
   )
