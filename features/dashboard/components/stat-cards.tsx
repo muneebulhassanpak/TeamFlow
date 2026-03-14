@@ -1,5 +1,6 @@
 import { CheckCheck, FolderOpen, ListTodo, Users } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 import type { DashboardStats } from '@/features/dashboard/hooks/use-dashboard'
 
 interface StatCardsProps {
@@ -10,37 +11,46 @@ const CARDS = [
   {
     key: 'activeProjects' as const,
     label: 'Active Projects',
+    description: 'Currently in progress',
     icon: FolderOpen,
+    iconClass: 'bg-blue-500/10 text-blue-500',
   },
   {
     key: 'openTasks' as const,
     label: 'Open Tasks',
+    description: 'Across all projects',
     icon: ListTodo,
+    iconClass: 'bg-orange-500/10 text-orange-500',
   },
   {
     key: 'memberCount' as const,
     label: 'Team Members',
+    description: 'In your workspace',
     icon: Users,
+    iconClass: 'bg-green-500/10 text-green-500',
   },
   {
     key: 'completedThisWeek' as const,
-    label: 'Completed This Week',
+    label: 'Done This Week',
+    description: 'Tasks completed',
     icon: CheckCheck,
+    iconClass: 'bg-violet-500/10 text-violet-500',
   },
 ]
 
 export function StatCards({ stats }: StatCardsProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {CARDS.map(({ key, label, icon: Icon }) => (
-        <Card key={key}>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
-            <Icon className="size-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{stats[key]}</p>
-          </CardContent>
+      {CARDS.map(({ key, label, description, icon: Icon, iconClass }) => (
+        <Card key={key} className="p-5">
+          <div className={cn('inline-flex rounded-xl p-2.5', iconClass)}>
+            <Icon className="size-5" />
+          </div>
+          <div className="mt-4">
+            <p className="text-3xl font-bold tracking-tight">{stats[key]}</p>
+            <p className="mt-1 text-sm font-medium">{label}</p>
+            <p className="text-muted-foreground text-xs">{description}</p>
+          </div>
         </Card>
       ))}
     </div>
