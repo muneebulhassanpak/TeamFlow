@@ -3,51 +3,63 @@ import { createClient } from "@/lib/supabase/client"
 import { projectKeys } from "@/lib/query-keys"
 import { CreateProjectInput, UpdateProjectInput } from "../validations/projects"
 
-export function useProjects(orgId: string) {
+import { keepPreviousData } from "@tanstack/react-query"
+
+export interface ProjectRow {
+  id: string
+  name: string
+  description: string | null
+  color: string
+  archived: boolean
+  created_at: string
+  updated_at: string
+  created_by: string
+  member_count: number
+  task_count: number
+}
+
+export interface ProjectsQueryParams {
+  search?: string
+  page?: number
+  pageSize?: number
+  sortBy?: "name" | "created_at"
+  sortDir?: "asc" | "desc"
+}
+
+export interface ProjectsResponse {
+  data: ProjectRow[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+export function useProjects(orgId: string, params: ProjectsQueryParams = {}) {
+  const {
+    search = "",
+    page = 1,
+    pageSize = 10,
+    sortBy = "created_at",
+    sortDir = "desc",
+  } = params
+
   return useQuery({
-    queryKey: projectKeys.all(orgId),
-    queryFn: async () => {
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from("projects")
-        .select(
-          `
-          id,
-          name,
-          description,
-          color,
-          archived,
-          created_at,
-          updated_at,
-          created_by,
-          project_members(count),
-          tasks(count)
-        `
-        )
-        .eq("org_id", orgId)
-        .eq("archived", false)
-        .order("created_at", { ascending: false })
-
-      if (error) throw error
-
-      // Transform the data to include counts
-      return (
-        data?.map((project) => ({
-          id: project.id,
-          name: project.name,
-          description: project.description,
-          color: project.color,
-          archived: project.archived,
-          created_at: project.created_at,
-          updated_at: project.updated_at,
-          created_by: project.created_by,
-          member_count: Array.isArray(project.project_members)
-            ? project.project_members.length
-            : 0,
-          task_count: Array.isArray(project.tasks) ? project.tasks.length : 0,
-        })) ?? []
-      )
+    queryKey: projectKeys.all(orgId, { search, page, pageSize, sortBy, sortDir }),
+    queryFn: async (): Promise<ProjectsResponse> => {
+      const url = new URL("/api/projects", window.location.origin)
+      url.searchParams.set("orgId", orgId)
+      if (search) url.searchParams.set("search", search)
+      url.searchParams.set("page", String(page))
+      url.searchParams.set("pageSize", String(pageSize))
+      url.searchParams.set("sortBy", sortBy)
+      url.searchParams.set("sortDir", sortDir)
+      
+      const res = await fetch(url.toString())
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error ?? "Failed to fetch projects")
+      return json
     },
+    enabled: !!orgId,
+    placeholderData: keepPreviousData,
   })
 }
 

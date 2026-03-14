@@ -15,7 +15,10 @@ export const orgKeys = {
 }
 
 export const projectKeys = {
-  all: (orgId: string) => ['projects', orgId] as const,
+  all: (orgId: string, params?: Record<string, unknown>) =>
+    params !== undefined
+      ? (["projects", orgId, params] as const)
+      : (["projects", orgId] as const),
   byId: (projectId: string) => ['projects', 'detail', projectId] as const,
   members: (projectId: string) => ['projects', projectId, 'members'] as const,
 }
