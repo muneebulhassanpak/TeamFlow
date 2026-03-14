@@ -1,10 +1,18 @@
 "use client"
 
-import { Plus } from "lucide-react"
+import { FolderOpen, Plus } from "lucide-react"
 import { useOrg } from "@/features/app-shell/context/org-context"
 import { useProjects } from "@/features/projects/hooks/use-projects"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
 import { CreateProjectDialog } from "./create-project-dialog"
 import { ProjectCard } from "./project-card"
 
@@ -25,7 +33,7 @@ export function ProjectsView() {
         </div>
         <CreateProjectDialog>
           <Button>
-            <Plus className="mr-2 size-4" />
+            <Plus className="size-4" />
             New Project
           </Button>
         </CreateProjectDialog>
@@ -53,17 +61,36 @@ export function ProjectsView() {
           ))}
         </div>
       ) : error ? (
-        <div className="rounded-lg border border-dashed border-border bg-muted/40 p-12 text-center">
-          <p className="text-sm text-destructive">
-            Failed to load projects: {(error as Error).message}
-          </p>
-        </div>
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <FolderOpen />
+            </EmptyMedia>
+            <EmptyTitle>Failed to load projects</EmptyTitle>
+            <EmptyDescription>{(error as Error).message}</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : projects?.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border bg-muted/40 p-12 text-center">
-          <p className="text-sm text-muted-foreground">
-            No projects yet. Create your first project to get started.
-          </p>
-        </div>
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <FolderOpen />
+            </EmptyMedia>
+            <EmptyTitle>No projects yet</EmptyTitle>
+            <EmptyDescription>
+              Create your first project to start organising your team&apos;s
+              work.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <CreateProjectDialog>
+              <Button>
+                <Plus className="size-4" />
+                New Project
+              </Button>
+            </CreateProjectDialog>
+          </EmptyContent>
+        </Empty>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {(projects ?? []).map((project) => (
