@@ -65,7 +65,7 @@ export function useCreateProject(orgId: string) {
       } = await supabase.auth.getUser()
 
       if (authError || !user) {
-        throw new Error('Unable to determine current user')
+        throw new Error("Unable to determine current user")
       }
 
       const { data, error } = await supabase

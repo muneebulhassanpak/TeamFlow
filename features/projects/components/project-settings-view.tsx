@@ -351,9 +351,7 @@ export function ProjectSettingsView({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge
-                    variant={member.is_manager ? "default" : "secondary"}
-                  >
+                  <Badge variant={member.is_manager ? "default" : "secondary"}>
                     {member.is_manager ? "admin" : "member"}
                   </Badge>
                   {canManageMembers && (
