@@ -49,6 +49,7 @@ export default async function OrgLayout({ children, params }: OrgLayoutProps) {
   return (
     <OrgProvider org={org} role={member.role}>
       <AppShell
+        userId={user.id}
         userEmail={user.email}
         userFullName={typedProfile?.full_name ?? null}
         userAvatarUrl={typedProfile?.avatar_url ?? null}

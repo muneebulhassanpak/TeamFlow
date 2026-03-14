@@ -26,8 +26,10 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { useOrg } from '@/features/app-shell/context/org-context'
+import { NotificationBell } from '@/features/notifications/components/notification-bell'
 
 interface NavbarProps {
+  userId: string
   userEmail: string
   userFullName: string | null
   userAvatarUrl: string | null
@@ -48,6 +50,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   'my-tasks': 'My Tasks',
   members: 'Members',
   activity: 'Activity',
+  notifications: 'Notifications',
   settings: 'Settings',
 }
 
@@ -59,7 +62,7 @@ function useBreadcrumb() {
   return SEGMENT_LABELS[segment] ?? segment
 }
 
-export function Navbar({ userEmail, userFullName, userAvatarUrl }: NavbarProps) {
+export function Navbar({ userId, userEmail, userFullName, userAvatarUrl }: NavbarProps) {
   const router = useRouter()
   const { org } = useOrg()
   const currentPage = useBreadcrumb()
@@ -92,6 +95,8 @@ export function Navbar({ userEmail, userFullName, userAvatarUrl }: NavbarProps) 
       </Breadcrumb>
 
       <div className="flex-1" />
+
+      <NotificationBell userId={userId} />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

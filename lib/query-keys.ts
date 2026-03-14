@@ -42,7 +42,10 @@ export const activityKeys = {
 }
 
 export const notificationKeys = {
-  all: (userId: string) => ['notifications', userId] as const,
+  all: (userId: string, params?: Record<string, unknown>) =>
+    params !== undefined
+      ? (['notifications', userId, params] as const)
+      : (['notifications', userId] as const),
   unreadCount: (userId: string) => ['notifications', userId, 'unread-count'] as const,
 }
 

@@ -90,6 +90,24 @@ export async function POST(req: NextRequest) {
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
 
+  // Notify the invited user if they already have an account
+  if (existingUser) {
+    const { data: org } = await supabase
+      .from('organizations')
+      .select('name')
+      .eq('id', orgId)
+      .single()
+
+    await supabase.from('notifications').insert({
+      user_id: existingUser.id,
+      org_id: orgId,
+      type: 'invite.received',
+      title: `You've been invited to join ${org?.name ?? 'a workspace'}`,
+      body: 'Accept the invitation to collaborate with the team.',
+      link: null,
+    })
+  }
+
   // TODO: send invite email via Resend (Module: Email)
   return NextResponse.json({ data: invite }, { status: 201 })
 }
