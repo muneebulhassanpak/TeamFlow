@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createClient } from "@/lib/supabase/client"
 import { projectKeys } from "@/lib/query-keys"
 import { CreateProjectInput, UpdateProjectInput } from "../validations/projects"
-import type { Project, ProjectMember } from "@/types"
 
 export function useProjects(orgId: string) {
   return useQuery({

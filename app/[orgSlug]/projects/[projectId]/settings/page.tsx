@@ -9,10 +9,8 @@ interface ProjectSettingsPageProps {
 }
 
 async function ProjectSettingsContent({
-  orgSlug,
   projectId,
 }: {
-  orgSlug: string
   projectId: string
 }) {
   // 1. Auth guard
@@ -72,8 +70,16 @@ async function ProjectSettingsContent({
     <ProjectSettingsView
       orgId={project.org_id}
       project={project}
-      projectMembers={(project.project_members ?? []) as any}
-      orgMembers={(orgMembers ?? []) as any}
+      projectMembers={
+        (project.project_members ?? []) as unknown as Parameters<
+          typeof ProjectSettingsView
+        >[0]["projectMembers"]
+      }
+      orgMembers={
+        (orgMembers ?? []) as unknown as Parameters<
+          typeof ProjectSettingsView
+        >[0]["orgMembers"]
+      }
       currentUserRole={member.role}
     />
   )
@@ -82,7 +88,7 @@ async function ProjectSettingsContent({
 export default async function ProjectSettingsPage({
   params,
 }: ProjectSettingsPageProps) {
-  const { orgSlug, projectId } = await params
+  const { projectId } = await params
 
   return (
     <div className="container mx-auto py-6">
@@ -94,7 +100,7 @@ export default async function ProjectSettingsPage({
       </div>
 
       <Suspense fallback={<ProjectSettingsSkeleton />}>
-        <ProjectSettingsContent orgSlug={orgSlug} projectId={projectId} />
+        <ProjectSettingsContent projectId={projectId} />
       </Suspense>
     </div>
   )

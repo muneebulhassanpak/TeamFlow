@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getAuthUser, requireOrgMember, isAdmin } from "@/lib/auth"
+import { getAuthUser, requireOrgMember } from "@/lib/auth"
 import { createServiceClient } from "@/lib/supabase/server"
 import { z } from "zod"
 
@@ -7,16 +7,6 @@ const CreateProjectSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
   color: z.string().regex(/^#[0-9A-F]{6}$/i),
-})
-
-const UpdateProjectSchema = z.object({
-  name: z.string().min(1).max(100).optional(),
-  description: z.string().max(500).optional(),
-  color: z
-    .string()
-    .regex(/^#[0-9A-F]{6}$/i)
-    .optional(),
-  archived: z.boolean().optional(),
 })
 
 // GET /api/projects?orgId=xxx

@@ -51,7 +51,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   settings: 'Settings',
 }
 
-function useBreadcrumb(orgSlug: string) {
+function useBreadcrumb() {
   const pathname = usePathname()
   // pathname = /orgSlug/segment/...
   const parts = pathname.split('/').filter(Boolean) // [orgSlug, segment, ...]
@@ -62,7 +62,7 @@ function useBreadcrumb(orgSlug: string) {
 export function Navbar({ userEmail, userFullName, userAvatarUrl }: NavbarProps) {
   const router = useRouter()
   const { org } = useOrg()
-  const currentPage = useBreadcrumb(org.slug)
+  const currentPage = useBreadcrumb()
   const initials = getInitials(userFullName, userEmail)
 
   async function handleSignOut() {

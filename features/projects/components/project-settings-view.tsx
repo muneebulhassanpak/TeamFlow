@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -126,7 +128,7 @@ export function ProjectSettingsView({
         ...values,
       })
       toast.success("Project updated successfully")
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to update project")
     }
   }
@@ -139,7 +141,7 @@ export function ProjectSettingsView({
       })
       setIsAddMemberOpen(false)
       toast.success("Member added to project")
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to add member")
     }
   }
@@ -148,7 +150,7 @@ export function ProjectSettingsView({
     try {
       await removeMemberMutation.mutateAsync(userId)
       toast.success("Member removed from project")
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to remove member")
     }
   }
@@ -158,7 +160,7 @@ export function ProjectSettingsView({
       await deleteProjectMutation.mutateAsync(project.id)
       toast.success("Project deleted successfully")
       // Redirect will happen via the mutation
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to delete project")
     }
   }
@@ -410,7 +412,7 @@ export function ProjectSettingsView({
                   <DialogHeader>
                     <DialogTitle>Delete Project</DialogTitle>
                     <DialogDescription>
-                      Are you sure you want to delete "{project.name}"? This
+                      Are you sure you want to delete &quot;{project.name}&quot;? This
                       action cannot be undone. All tasks, members, and data
                       associated with this project will be permanently removed.
                     </DialogDescription>

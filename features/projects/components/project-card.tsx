@@ -63,7 +63,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
       toast.success(
         project.archived ? "Project unarchived" : "Project archived"
       )
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to update project")
     }
   }
@@ -72,7 +72,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
     try {
       await deleteProjectMutation.mutateAsync(project.id)
       toast.success("Project deleted")
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to delete project")
     }
   }
@@ -126,7 +126,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 <DialogHeader>
                   <DialogTitle>Delete Project</DialogTitle>
                   <DialogDescription>
-                    Are you sure you want to delete "{project.name}"? This
+                    Are you sure you want to delete &quot;{project.name}&quot;? This
                     action cannot be undone. All tasks and data associated with
                     this project will be permanently removed.
                   </DialogDescription>

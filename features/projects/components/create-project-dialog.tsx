@@ -65,7 +65,7 @@ export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
       await createProject.mutateAsync(data)
       setOpen(false)
       form.reset()
-    } catch (error) {
+    } catch (_error) {
       // Error is handled by the mutation
     }
   }
@@ -77,7 +77,7 @@ export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
         <DialogHeader>
           <DialogTitle>Create Project</DialogTitle>
           <DialogDescription>
-            Create a new project to organize your team's work.
+            Create a new project to organize your team&apos;s work.
           </DialogDescription>
         </DialogHeader>
 
