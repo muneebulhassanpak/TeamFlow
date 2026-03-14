@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from 'react'
-import { CheckCheck } from 'lucide-react'
+import { Bell, CheckCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { useOrg } from '@/features/app-shell/context/org-context'
 import {
   useNotifications,
@@ -53,9 +54,15 @@ export function NotificationsView({ userId }: NotificationsViewProps) {
       {isLoading ? (
         <NotificationsSkeleton rows={8} />
       ) : notifications.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-12 text-center">
-          <p className="text-sm text-muted-foreground">You&apos;re all caught up!</p>
-        </div>
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Bell />
+            </EmptyMedia>
+            <EmptyTitle>You&apos;re all caught up!</EmptyTitle>
+            <EmptyDescription>No notifications to show right now.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <div className="rounded-lg border divide-y overflow-hidden">
           {notifications.map((n) => (

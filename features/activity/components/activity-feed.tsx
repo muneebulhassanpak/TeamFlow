@@ -1,6 +1,14 @@
 "use client"
 
+import { Activity } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+} from '@/components/ui/empty'
 import type { ActivityLogWithActor } from '@/types'
 import { formatActivityAction, formatRelativeTime } from '@/features/activity/utils'
 
@@ -11,9 +19,15 @@ interface ActivityFeedProps {
 export function ActivityFeed({ logs }: ActivityFeedProps) {
   if (logs.length === 0) {
     return (
-      <p className="py-12 text-center text-sm text-muted-foreground">
-        No activity yet.
-      </p>
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <Activity />
+          </EmptyMedia>
+          <EmptyTitle>No activity yet</EmptyTitle>
+          <EmptyDescription>Activity will appear here as your team works.</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     )
   }
 

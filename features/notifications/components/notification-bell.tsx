@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Bell, CheckCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -71,9 +72,14 @@ export function NotificationBell({ userId }: NotificationBellProps) {
         <DropdownMenuSeparator />
 
         {notifications.length === 0 ? (
-          <p className="px-4 py-6 text-center text-sm text-muted-foreground">
-            No notifications
-          </p>
+          <Empty className="border-0 py-4 md:py-4">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <Bell />
+              </EmptyMedia>
+              <EmptyTitle>No notifications</EmptyTitle>
+            </EmptyHeader>
+          </Empty>
         ) : (
           notifications.map((n) => (
             <DropdownMenuItem

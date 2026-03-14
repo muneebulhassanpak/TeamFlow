@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
-import { Search } from 'lucide-react'
+import { ListTodo, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { useOrg } from '@/features/app-shell/context/org-context'
 import { useMyTasks, type TaskWithProject } from '@/features/dashboard/hooks/use-dashboard'
 import { groupTasksByProject, PRIORITY_COLORS, STATUS_LABELS } from '@/features/dashboard/utils'
@@ -87,11 +88,21 @@ export function MyTasksView({ userId }: MyTasksViewProps) {
       {isLoading ? (
         <MyTasksSkeleton />
       ) : groups.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-12 text-center">
-          <p className="text-sm text-muted-foreground">
-            {priority || status || search ? 'No tasks match your filters.' : 'No tasks assigned to you yet.'}
-          </p>
-        </div>
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <ListTodo />
+            </EmptyMedia>
+            <EmptyTitle>
+              {priority || status || search ? 'No matching tasks' : 'No tasks yet'}
+            </EmptyTitle>
+            <EmptyDescription>
+              {priority || status || search
+                ? 'Try adjusting your filters.'
+                : 'Tasks assigned to you will appear here.'}
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <div className="flex flex-col gap-6">
           {groups.map((group) => (
