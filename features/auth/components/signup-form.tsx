@@ -33,7 +33,7 @@ export function SignupForm() {
     signup.mutate(values)
   }
 
-  const isPending = signup.isPending || oauth.isPending
+  const isPending = signup.isPending || signup.isSuccess || oauth.isPending
 
   return (
     <div className="flex flex-col gap-6">
@@ -157,7 +157,7 @@ export function SignupForm() {
           )}
 
           <Button type="submit" className="w-full" disabled={isPending}>
-            {signup.isPending && <Loader2 className="size-4 animate-spin" />}
+            {(signup.isPending || signup.isSuccess) && <Loader2 className="size-4 animate-spin" />}
             Create account
           </Button>
         </form>
