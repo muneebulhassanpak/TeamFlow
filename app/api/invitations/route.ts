@@ -90,8 +90,8 @@ export async function POST(req: NextRequest) {
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
 
-  // Notify the invited user if they already have an account
   if (existingUser) {
+    // Existing user — send in-app notification
     const { data: org } = await supabase
       .from('organizations')
       .select('name')
@@ -106,8 +106,15 @@ export async function POST(req: NextRequest) {
       body: 'Accept the invitation to collaborate with the team.',
       link: null,
     })
+  } else {
+    // New user — send invite email via Supabase (uses configured email provider)
+    const { error: inviteEmailError } = await supabase.auth.admin.inviteUserByEmail(email, {
+      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/confirm?invite_id=${invite.id}`,
+    })
+    if (inviteEmailError) {
+      console.error('[invitations] inviteUserByEmail failed:', inviteEmailError.message)
+    }
   }
 
-  // TODO: send invite email via Resend (Module: Email)
   return NextResponse.json({ data: invite }, { status: 201 })
 }
