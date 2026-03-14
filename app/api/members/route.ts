@@ -3,7 +3,9 @@ import { getAuthUser, requireOrgMember } from '@/lib/auth'
 import { createServiceClient } from '@/lib/supabase/server'
 import { isAdmin } from '@/lib/auth'
 
-// GET /api/members?orgId=xxx  — list members with profiles
+const DEFAULT_PAGE_SIZE = 10
+
+// GET /api/members?orgId=xxx&search=xxx&page=1&pageSize=10&sortBy=joined_at&sortDir=asc
 export async function GET(req: NextRequest) {
   const { user, error } = await getAuthUser()
   if (error || !user) return NextResponse.json({ error: error ?? 'Unauthorized' }, { status: 401 })
@@ -13,6 +15,15 @@ export async function GET(req: NextRequest) {
 
   const { member, error: memberError } = await requireOrgMember(user.id, orgId)
   if (memberError || !member) return NextResponse.json({ error: memberError }, { status: 403 })
+
+  const search = req.nextUrl.searchParams.get('search') ?? ''
+  const page = Math.max(1, parseInt(req.nextUrl.searchParams.get('page') ?? '1', 10))
+  const pageSize = Math.min(
+    100,
+    Math.max(1, parseInt(req.nextUrl.searchParams.get('pageSize') ?? String(DEFAULT_PAGE_SIZE), 10)),
+  )
+  const sortBy = req.nextUrl.searchParams.get('sortBy') === 'role' ? 'role' : 'joined_at'
+  const sortDir = req.nextUrl.searchParams.get('sortDir') === 'desc' ? 'desc' : 'asc'
 
   const supabase = createServiceClient()
   const { data, error: dbError } = await supabase
@@ -30,7 +41,7 @@ export async function GET(req: NextRequest) {
     (authUsers?.users ?? []).filter((u) => userIds.includes(u.id)).map((u) => [u.id, u.email]),
   )
 
-  const members = (data ?? []).map((m) => ({
+  let members = (data ?? []).map((m) => ({
     id: m.id,
     user_id: m.user_id,
     role: m.role,
@@ -40,7 +51,31 @@ export async function GET(req: NextRequest) {
     avatar_url: (m.profiles as { avatar_url: string | null } | null)?.avatar_url ?? null,
   }))
 
-  return NextResponse.json({ data: members })
+  // Server-side search
+  if (search.trim()) {
+    const q = search.trim().toLowerCase()
+    members = members.filter(
+      (m) =>
+        m.email.toLowerCase().includes(q) || (m.full_name?.toLowerCase().includes(q) ?? false),
+    )
+  }
+
+  // Server-side sort
+  members.sort((a, b) => {
+    if (sortBy === 'role') {
+      return sortDir === 'asc' ? a.role.localeCompare(b.role) : b.role.localeCompare(a.role)
+    }
+    const diff =
+      new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime()
+    return sortDir === 'asc' ? diff : -diff
+  })
+
+  // Server-side pagination
+  const total = members.length
+  const start = (page - 1) * pageSize
+  const paginatedMembers = members.slice(start, start + pageSize)
+
+  return NextResponse.json({ data: paginatedMembers, total, page, pageSize })
 }
 
 // DELETE /api/members?orgId=xxx&userId=xxx  — remove a member (admin only)

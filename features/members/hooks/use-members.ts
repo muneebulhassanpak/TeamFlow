@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData } from '@tanstack/react-query'
 import { orgKeys } from '@/lib/query-keys'
 import type { OrgRole } from '@/types'
 
@@ -20,18 +21,42 @@ export interface InvitationRow {
   expires_at: string
 }
 
+export interface MembersQueryParams {
+  search?: string
+  page?: number
+  pageSize?: number
+  sortBy?: 'role' | 'joined_at'
+  sortDir?: 'asc' | 'desc'
+}
+
+export interface MembersResponse {
+  data: MemberRow[]
+  total: number
+  page: number
+  pageSize: number
+}
+
 // ─── Fetch members ────────────────────────────────────────────────────────────
 
-export function useMembers(orgId: string) {
+export function useMembers(orgId: string, params: MembersQueryParams = {}) {
+  const { search = '', page = 1, pageSize = 10, sortBy = 'joined_at', sortDir = 'asc' } = params
   return useQuery({
-    queryKey: orgKeys.members(orgId),
-    queryFn: async (): Promise<MemberRow[]> => {
-      const res = await fetch(`/api/members?orgId=${orgId}`)
+    queryKey: orgKeys.members(orgId, { search, page, pageSize, sortBy, sortDir }),
+    queryFn: async (): Promise<MembersResponse> => {
+      const url = new URL('/api/members', window.location.origin)
+      url.searchParams.set('orgId', orgId)
+      if (search) url.searchParams.set('search', search)
+      url.searchParams.set('page', String(page))
+      url.searchParams.set('pageSize', String(pageSize))
+      url.searchParams.set('sortBy', sortBy)
+      url.searchParams.set('sortDir', sortDir)
+      const res = await fetch(url.toString())
       const json = await res.json()
       if (!res.ok) throw new Error(json.error ?? 'Failed to fetch members')
-      return json.data
+      return json
     },
     enabled: !!orgId,
+    placeholderData: keepPreviousData,
   })
 }
 

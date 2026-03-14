@@ -1,19 +1,12 @@
 'use client'
 
 import * as React from 'react'
-import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  flexRender,
-  type ColumnDef,
-  type SortingState,
-} from '@tanstack/react-table'
-import { MoreHorizontal, ArrowUpDown, Loader2 } from 'lucide-react'
+import { MoreHorizontal, ArrowUpDown, Loader2, Search } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,148 +35,183 @@ function getInitials(name: string | null, email: string) {
 
 interface MembersTableProps {
   data: MemberRow[]
+  total: number
+  page: number
+  pageSize: number
+  search: string
+  sortDir: 'asc' | 'desc'
   currentUserId: string
+  onSearchChange: (value: string) => void
+  onPageChange: (page: number) => void
+  onSortDirChange: (dir: 'asc' | 'desc') => void
 }
 
-export function MembersTable({ data, currentUserId }: MembersTableProps) {
+export function MembersTable({
+  data,
+  total,
+  page,
+  pageSize,
+  search,
+  sortDir,
+  currentUserId,
+  onSearchChange,
+  onPageChange,
+  onSortDirChange,
+}: MembersTableProps) {
   const { org, role } = useOrg()
   const removeMember = useRemoveMember(org.id)
-  const [sorting, setSorting] = React.useState<SortingState>([])
   const isAdmin = role === 'admin'
 
-  const columns: ColumnDef<MemberRow>[] = [
-    {
-      id: 'member',
-      header: 'Member',
-      accessorFn: (row) => row.full_name ?? row.email,
-      cell: ({ row }) => {
-        const m = row.original
-        return (
-          <div className="flex items-center gap-3">
-            <Avatar className="size-8">
-              {m.avatar_url && <AvatarImage src={m.avatar_url} alt={m.full_name ?? m.email} />}
-              <AvatarFallback className="text-xs">
-                {getInitials(m.full_name, m.email)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-              {m.full_name && <span className="text-sm font-medium">{m.full_name}</span>}
-              <span className="text-muted-foreground text-xs">{m.email}</span>
-            </div>
-          </div>
-        )
-      },
-    },
-    {
-      accessorKey: 'role',
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="-ml-3 h-8"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Role
-          <ArrowUpDown className="ml-2 size-3.5" />
-        </Button>
-      ),
-      cell: ({ row }) => (
-        <Badge variant={row.original.role === 'admin' ? 'default' : 'secondary'}>
-          {row.original.role}
-        </Badge>
-      ),
-    },
-    {
-      accessorKey: 'joined_at',
-      header: 'Joined',
-      cell: ({ row }) =>
-        new Date(row.original.joined_at).toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric',
-        }),
-    },
-    ...(isAdmin
-      ? [
-          {
-            id: 'actions',
-            header: '',
-            cell: ({ row }: { row: { original: MemberRow } }) => {
-              const m = row.original
-              const isSelf = m.user_id === currentUserId
-              if (isSelf) return null
-              return (
-                <div className="flex justify-end">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="size-8">
-                        {removeMember.isPending && removeMember.variables === m.user_id ? (
-                          <Loader2 className="size-4 animate-spin" />
-                        ) : (
-                          <MoreHorizontal className="size-4" />
-                        )}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        variant="destructive"
-                        onClick={() => removeMember.mutate(m.user_id)}
-                      >
-                        Remove member
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              )
-            },
-          } satisfies ColumnDef<MemberRow>,
-        ]
-      : []),
-  ]
+  // Local input state for debouncing the search URL param
+  const [inputValue, setInputValue] = React.useState(search)
 
-  const table = useReactTable({
-    data,
-    columns,
-    state: { sorting },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-  })
+  // Sync local input if parent search changes (e.g. back/forward navigation)
+  React.useEffect(() => {
+    setInputValue(search)
+  }, [search])
+
+  // Debounce: push to URL only after 300 ms of no typing
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (inputValue !== search) onSearchChange(inputValue)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [inputValue]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const pageCount = Math.ceil(total / pageSize)
+  const colSpan = isAdmin ? 4 : 3
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((hg) => (
-            <TableRow key={hg.id}>
-              {hg.headers.map((h) => (
-                <TableHead key={h.id}>
-                  {h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
+    <div className="flex flex-col gap-3">
+      {/* Search bar */}
+      <div className="relative w-64">
+        <Search className="text-muted-foreground absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
+        <Input
+          placeholder="Search members…"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          className="pl-8 text-sm"
+        />
+      </div>
+
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No members found.
-              </TableCell>
+              <TableHead>Member</TableHead>
+              <TableHead>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="-ml-3 h-8"
+                  onClick={() => onSortDirChange(sortDir === 'asc' ? 'desc' : 'asc')}
+                >
+                  Role
+                  <ArrowUpDown className="ml-2 size-3.5" />
+                </Button>
+              </TableHead>
+              <TableHead>Joined</TableHead>
+              {isAdmin && <TableHead />}
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {data.length ? (
+              data.map((m) => (
+                <TableRow key={m.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="size-8">
+                        {m.avatar_url && (
+                          <AvatarImage src={m.avatar_url} alt={m.full_name ?? m.email} />
+                        )}
+                        <AvatarFallback className="text-xs">
+                          {getInitials(m.full_name, m.email)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        {m.full_name && (
+                          <span className="text-sm font-medium">{m.full_name}</span>
+                        )}
+                        <span className="text-muted-foreground text-xs">{m.email}</span>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={m.role === 'admin' ? 'default' : 'secondary'}>{m.role}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(m.joined_at).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </TableCell>
+                  {isAdmin && (
+                    <TableCell>
+                      {m.user_id !== currentUserId && (
+                        <div className="flex justify-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="size-8">
+                                {removeMember.isPending && removeMember.variables === m.user_id ? (
+                                  <Loader2 className="size-4 animate-spin" />
+                                ) : (
+                                  <MoreHorizontal className="size-4" />
+                                )}
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={() => removeMember.mutate(m.user_id)}
+                              >
+                                Remove member
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      )}
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={colSpan} className="h-24 text-center">
+                  No members found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Pagination */}
+      {pageCount > 1 && (
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">
+            Page {page} of {pageCount}
+          </span>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(page - 1)}
+              disabled={page <= 1}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(page + 1)}
+              disabled={page >= pageCount}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -6,7 +6,10 @@
 export const orgKeys = {
   all: ['organizations'] as const,
   bySlug: (slug: string) => ['organizations', slug] as const,
-  members: (orgId: string) => ['organizations', orgId, 'members'] as const,
+  members: (orgId: string, params?: Record<string, unknown>) =>
+    params !== undefined
+      ? (['organizations', orgId, 'members', params] as const)
+      : (['organizations', orgId, 'members'] as const),
   roles: (orgId: string) => ['organizations', orgId, 'roles'] as const,
   invitations: (orgId: string) => ['organizations', orgId, 'invitations'] as const,
 }
