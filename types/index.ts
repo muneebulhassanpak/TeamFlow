@@ -11,6 +11,8 @@ export type ProjectMember = Database['public']['Tables']['project_members']['Row
 export type Task = Database['public']['Tables']['tasks']['Row']
 export type ActivityLog = Database['public']['Tables']['activity_logs']['Row']
 export type Notification = Database['public']['Tables']['notifications']['Row']
+export type Subtask = Database['public']['Tables']['subtasks']['Row']
+export type TaskComment = Database['public']['Tables']['task_comments']['Row']
 
 // ─── Enum aliases ─────────────────────────────────────────────────────────────
 
@@ -38,6 +40,17 @@ export type ProjectWithStats = Project & {
 
 export type ActivityLogWithActor = ActivityLog & {
   actor: Pick<Profile, 'id' | 'full_name' | 'avatar_url'>
+}
+
+export type TaskCommentWithAuthor = TaskComment & {
+  author: Pick<Profile, 'id' | 'full_name' | 'avatar_url'>
+}
+
+export type TaskWithCounts = Task & {
+  assignee: Pick<Profile, 'id' | 'full_name' | 'avatar_url'> | null
+  subtask_count: number
+  completed_subtask_count: number
+  comment_count: number
 }
 
 // ─── API response wrappers ────────────────────────────────────────────────────

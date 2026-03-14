@@ -55,3 +55,11 @@ export const notificationKeys = {
 export const dashboardKeys = {
   stats: (orgId: string) => ['dashboard', 'stats', orgId] as const,
 }
+
+export const subtaskKeys = {
+  byTask: (taskId: string) => ['subtasks', taskId] as const,
+}
+
+export const commentKeys = {
+  byTask: (taskId: string) => ['comments', taskId] as const,
+}
