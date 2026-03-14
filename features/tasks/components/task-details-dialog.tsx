@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { CalendarIcon, Clock, AlignLeft, Flag, CheckCircle2, User, LayoutList, Maximize, Minimize } from "lucide-react"
+import { CalendarIcon, Clock, Flag, CheckCircle2, User, LayoutList, Maximize, Minimize } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { priorityConfig, statusLabels } from "../utils"
 
@@ -75,10 +75,6 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold flex items-center gap-2 text-foreground">
-                <AlignLeft className="w-4 h-4 text-muted-foreground" />
-                Description
-              </h3>
               {task.description ? (
                 <div className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap bg-primary/5 p-4 rounded-lg border border-primary/10">
                   {task.description}
@@ -110,8 +106,16 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
               </Badge>
             </div>
 
-            {/* Assignee */}
+            {/* Due Date */}
             <div className="flex items-center gap-2.5">
+              <CalendarIcon className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-foreground">
+                {task.due_date ? format(new Date(task.due_date), "MMM d, yyyy") : <span className="text-muted-foreground font-normal">No due date</span>}
+              </span>
+            </div>
+
+            {/* Assignee */}
+            <div className="flex items-center gap-2.5 ml-auto">
               <User className="w-4 h-4 text-muted-foreground" />
               {task.assignee ? (
                 <div className="flex items-center gap-2">
@@ -122,16 +126,8 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
                   <span className="text-sm font-medium">{task.assignee.full_name || "Unknown"}</span>
                 </div>
               ) : (
-                <span className="text-sm text-muted-foreground italic">Unassigned</span>
+                <span className="text-sm text-muted-foreground">Unassigned</span>
               )}
-            </div>
-
-            {/* Due Date */}
-            <div className="flex items-center gap-2.5">
-              <CalendarIcon className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-foreground">
-                {task.due_date ? format(new Date(task.due_date), "MMM d, yyyy") : <span className="text-muted-foreground italic">No due date</span>}
-              </span>
             </div>
 
           </div>

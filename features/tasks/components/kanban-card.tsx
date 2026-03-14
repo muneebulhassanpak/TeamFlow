@@ -63,24 +63,26 @@ export function KanbanCard({ task, onClick }: KanbanCardProps) {
       }`}
     >
       <div className="flex items-start justify-between gap-2">
-        <Badge variant="secondary" className={`font-normal ${priorityConfig[task.priority].color}`}>
-          {priorityConfig[task.priority].label}
-        </Badge>
+        <p className="text-sm font-medium line-clamp-2 leading-snug flex-1">{task.title}</p>
         
-        {/* Drag Handle */}
-        <div
-          {...attributes}
-          {...listeners}
-          className="cursor-grab opacity-0 group-hover:opacity-100 transition-opacity active:cursor-grabbing p-1 -mr-2 -mt-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded"
-        >
-          <GripVertical className="size-4" />
+        <div className="flex items-start gap-1 shrink-0 mt-0.5">
+          <Badge variant="secondary" className={`font-normal text-[10px] px-1.5 py-0 h-4 ${priorityConfig[task.priority].color}`}>
+            {priorityConfig[task.priority].label}
+          </Badge>
+          {/* Drag Handle */}
+          <div
+            {...attributes}
+            {...listeners}
+            onClick={(e) => e.stopPropagation()}
+            className="cursor-grab opacity-0 group-hover:opacity-100 transition-opacity active:cursor-grabbing p-0.5 -mr-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded flex-shrink-0"
+          >
+            <GripVertical className="size-4" />
+          </div>
         </div>
       </div>
 
-      <p className="text-sm font-medium line-clamp-2 leading-snug">{task.title}</p>
-
-      <div className="mt-auto flex items-center justify-between pt-1">
-        <div className="flex items-center text-xs text-muted-foreground">
+      <div className="mt-auto flex items-end justify-between pt-2">
+        <div className="flex items-center text-xs text-muted-foreground min-h-6">
           {task.due_date && (
             <>
               <CalendarIcon className="mr-1.5 size-3.5" />
@@ -91,12 +93,18 @@ export function KanbanCard({ task, onClick }: KanbanCardProps) {
           )}
         </div>
         
-        {task.assignee && (
-          <Avatar className="size-6 border">
-            <AvatarImage src={task.assignee.avatar_url ?? ""} />
-            <AvatarFallback className="text-[10px]">{initials}</AvatarFallback>
-          </Avatar>
-        )}
+        <div className="flex items-center ml-auto">
+          {task.assignee ? (
+            <Avatar className="size-6 border">
+              <AvatarImage src={task.assignee.avatar_url ?? ""} />
+              <AvatarFallback className="text-[10px] bg-primary/10 text-primary">{initials}</AvatarFallback>
+            </Avatar>
+          ) : (
+            <div className="size-6 rounded-full border border-dashed flex items-center justify-center bg-muted/50">
+              <span className="text-[10px] text-muted-foreground">?</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
