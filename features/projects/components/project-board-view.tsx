@@ -56,14 +56,12 @@ export function ProjectBoardView({ projectId, projectName }: ProjectBoardViewPro
           <h1 className="text-2xl font-semibold">{projectName}</h1>
           <p className="text-sm text-muted-foreground">Manage tasks for this project</p>
         </div>
-        <div className="flex items-center gap-3">
-          <CreateTaskDialog projectId={projectId} />
-        </div>
       </div>
 
       {/* Filters Row */}
-      <div className="flex items-center">
+      <div className="flex items-center justify-between">
         <TaskFilters projectId={projectId} />
+        <CreateTaskDialog projectId={projectId} />
       </div>
 
       {/* Board Area */}
