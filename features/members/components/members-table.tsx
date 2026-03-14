@@ -121,7 +121,7 @@ export function MembersTable({
                     <Badge
                       variant={m.role === "admin" ? "default" : "secondary"}
                     >
-                      {m.role}
+                      {m.role.charAt(0).toUpperCase() + m.role.slice(1)}
                     </Badge>
                   </TableCell>
                   <TableCell>
