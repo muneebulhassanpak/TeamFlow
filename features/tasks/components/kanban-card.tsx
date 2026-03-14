@@ -6,17 +6,11 @@ import { TaskRow } from "../hooks/use-tasks"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { CalendarIcon, GripVertical } from "lucide-react"
+import { priorityConfig } from "../utils"
 
 interface KanbanCardProps {
   task: TaskRow
   onClick?: () => void
-}
-
-const priorityColors = {
-  low: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  medium: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  high: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  urgent: "border-red-500 bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
 }
 
 export function KanbanCard({ task, onClick }: KanbanCardProps) {
@@ -69,8 +63,8 @@ export function KanbanCard({ task, onClick }: KanbanCardProps) {
       }`}
     >
       <div className="flex items-start justify-between gap-2">
-        <Badge variant="secondary" className={`font-normal ${priorityColors[task.priority]}`}>
-          {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+        <Badge variant="secondary" className={`font-normal ${priorityConfig[task.priority].color}`}>
+          {priorityConfig[task.priority].label}
         </Badge>
         
         {/* Drag Handle */}
