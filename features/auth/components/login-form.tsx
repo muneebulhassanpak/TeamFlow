@@ -8,6 +8,7 @@ import { Github, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { PasswordInput } from '@/components/shared/password-input'
 import {
   Form,
   FormControl,
@@ -123,8 +124,7 @@ export function LoginForm() {
                   <FormLabel>Password</FormLabel>
                 </div>
                 <FormControl>
-                  <Input
-                    type="password"
+                  <PasswordInput
                     placeholder="••••••••"
                     autoComplete="current-password"
                     disabled={isPending}
