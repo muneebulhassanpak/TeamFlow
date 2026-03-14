@@ -22,7 +22,7 @@ export function AppShell({ children, userEmail, userFullName, userAvatarUrl }: A
           userFullName={userFullName}
           userAvatarUrl={userAvatarUrl}
         />
-        <div className="flex flex-1 flex-col gap-4 p-6">{children}</div>
+        <div className="flex flex-1 flex-col gap-4 px-6 py-3">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   )
