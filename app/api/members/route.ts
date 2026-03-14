@@ -24,6 +24,8 @@ export async function GET(req: NextRequest) {
   )
   const sortBy = req.nextUrl.searchParams.get('sortBy') === 'role' ? 'role' : 'joined_at'
   const sortDir = req.nextUrl.searchParams.get('sortDir') === 'desc' ? 'desc' : 'asc'
+  const roleFilter = req.nextUrl.searchParams.get('role') ?? ''
+  const projectIds = req.nextUrl.searchParams.get('projectIds')?.split(',').filter(Boolean) ?? []
 
   const supabase = createServiceClient()
   const { data, error: dbError } = await supabase
@@ -50,6 +52,21 @@ export async function GET(req: NextRequest) {
     full_name: m.profiles?.full_name ?? null,
     avatar_url: m.profiles?.avatar_url ?? null,
   }))
+
+  // Filter by role
+  if (roleFilter === 'admin' || roleFilter === 'member') {
+    members = members.filter((m) => m.role === roleFilter)
+  }
+
+  // Filter by projects — keep members who belong to at least one of the specified projects
+  if (projectIds.length > 0) {
+    const { data: projectMembers } = await supabase
+      .from('project_members')
+      .select('user_id')
+      .in('project_id', projectIds)
+    const projectUserIds = new Set((projectMembers ?? []).map((pm) => pm.user_id))
+    members = members.filter((m) => projectUserIds.has(m.user_id))
+  }
 
   // Server-side search
   if (search.trim()) {

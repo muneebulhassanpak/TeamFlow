@@ -27,6 +27,8 @@ export interface MembersQueryParams {
   pageSize?: number
   sortBy?: 'role' | 'joined_at'
   sortDir?: 'asc' | 'desc'
+  role?: string
+  projectIds?: string[]
 }
 
 export interface MembersResponse {
@@ -39,9 +41,9 @@ export interface MembersResponse {
 // ─── Fetch members ────────────────────────────────────────────────────────────
 
 export function useMembers(orgId: string, params: MembersQueryParams = {}) {
-  const { search = '', page = 1, pageSize = 10, sortBy = 'joined_at', sortDir = 'asc' } = params
+  const { search = '', page = 1, pageSize = 10, sortBy = 'joined_at', sortDir = 'asc', role = '', projectIds = [] } = params
   return useQuery({
-    queryKey: orgKeys.members(orgId, { search, page, pageSize, sortBy, sortDir }),
+    queryKey: orgKeys.members(orgId, { search, page, pageSize, sortBy, sortDir, role, projectIds }),
     queryFn: async (): Promise<MembersResponse> => {
       const url = new URL('/api/members', window.location.origin)
       url.searchParams.set('orgId', orgId)
@@ -50,6 +52,8 @@ export function useMembers(orgId: string, params: MembersQueryParams = {}) {
       url.searchParams.set('pageSize', String(pageSize))
       url.searchParams.set('sortBy', sortBy)
       url.searchParams.set('sortDir', sortDir)
+      if (role) url.searchParams.set('role', role)
+      if (projectIds.length > 0) url.searchParams.set('projectIds', projectIds.join(','))
       const res = await fetch(url.toString())
       const json = await res.json()
       if (!res.ok) throw new Error(json.error ?? 'Failed to fetch members')

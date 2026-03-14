@@ -1,8 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Search, SearchX, Users } from "lucide-react"
+import { Search, SearchX, Users, ChevronDown, X, FolderKanban } from "lucide-react"
 import {
+  parseAsArrayOf,
   parseAsInteger,
   parseAsString,
   parseAsStringEnum,
@@ -10,7 +11,18 @@ import {
 } from "nuqs"
 
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Badge } from "@/components/ui/badge"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   Empty,
   EmptyContent,
@@ -20,6 +32,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { useMembers } from "@/features/members/hooks/use-members"
+import { useProjects } from "@/features/projects/hooks/use-projects"
 import { MembersTable } from "./members-table"
 import { InviteDialog } from "./invite-dialog"
 import { PendingInvitations } from "./pending-invitations"
@@ -45,6 +58,8 @@ export function MembersView({ currentUserId }: MembersViewProps) {
     sortDir: parseAsStringEnum<"asc" | "desc">(["asc", "desc"]).withDefault(
       "asc"
     ),
+    role: parseAsString.withDefault(""),
+    projectIds: parseAsArrayOf(parseAsString).withDefault([]),
   })
 
   // Local input state for debouncing the search URL param
@@ -73,7 +88,18 @@ export function MembersView({ currentUserId }: MembersViewProps) {
     pageSize: PAGE_SIZE,
     sortBy: filters.sortBy,
     sortDir: filters.sortDir,
+    role: filters.role,
+    projectIds: filters.projectIds,
   })
+
+  const { data: projectsResponse } = useProjects(org.id, { pageSize: 100 })
+  const allProjects = projectsResponse?.data ?? []
+
+  const hasFilters = filters.role !== "" || filters.projectIds.length > 0
+
+  function clearFilters() {
+    setFilters({ role: "", projectIds: [], page: 1 })
+  }
 
   const members = response?.data ?? []
   const total = response?.total ?? 0
@@ -81,18 +107,16 @@ export function MembersView({ currentUserId }: MembersViewProps) {
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Members</h1>
-          <p className="text-sm text-muted-foreground">
-            {total} {total === 1 ? "member" : "members"} in {org.name}
-          </p>
-        </div>
-        {isAdmin && <InviteDialog />}
+      <div>
+        <h1 className="text-2xl font-semibold">Members</h1>
+        <p className="text-sm text-muted-foreground">
+          {total} {total === 1 ? "member" : "members"} in {org.name}
+        </p>
       </div>
 
-      {/* Search */}
+      {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
+        {/* Search */}
         <div className="relative w-full sm:w-60">
           <Search className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -102,6 +126,90 @@ export function MembersView({ currentUserId }: MembersViewProps) {
             className="pl-8 text-sm"
           />
         </div>
+
+        {/* Role filter */}
+        <Select
+          value={filters.role || "all"}
+          onValueChange={(v) => setFilters({ role: v === "all" ? "" : v, page: 1 })}
+        >
+          <SelectTrigger className="w-36">
+            <SelectValue placeholder="All roles" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All roles</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="member">Member</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Projects multi-select */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-9 gap-1.5">
+              <FolderKanban className="size-4" />
+              {filters.projectIds.length === 0 ? (
+                "All projects"
+              ) : (
+                <span className="flex items-center gap-1.5">
+                  All projects
+                  <Badge variant="secondary" className="rounded-full px-1.5 py-0 text-xs">
+                    {filters.projectIds.length}
+                  </Badge>
+                </span>
+              )}
+              <ChevronDown className="size-4 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="start" className="w-64 p-2">
+            {allProjects.length === 0 ? (
+              <p className="text-muted-foreground py-4 text-center text-sm">No projects</p>
+            ) : (
+              <div className="flex flex-col gap-0.5">
+                {allProjects.map((project) => (
+                  <label
+                    key={project.id}
+                    className="hover:bg-muted flex cursor-pointer items-center gap-2.5 rounded px-2 py-1.5 text-sm"
+                  >
+                    <Checkbox
+                      checked={filters.projectIds.includes(project.id)}
+                      onCheckedChange={(checked) => {
+                        const next = checked
+                          ? [...filters.projectIds, project.id]
+                          : filters.projectIds.filter((id) => id !== project.id)
+                        setFilters({ projectIds: next, page: 1 })
+                      }}
+                    />
+                    <span
+                      className="size-2 shrink-0 rounded-full"
+                      style={{ backgroundColor: project.color }}
+                    />
+                    <span className="truncate">{project.name}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </PopoverContent>
+        </Popover>
+
+        {/* Clear filters */}
+        {hasFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="h-9 px-3 text-muted-foreground hover:text-foreground"
+          >
+            <X className="size-4" />
+            Clear
+          </Button>
+        )}
+
+        {/* Invite button — pushed to right */}
+        {isAdmin && (
+          <div className="ml-auto">
+            <InviteDialog />
+          </div>
+        )}
       </div>
 
       {/* Members table */}
