@@ -18,9 +18,11 @@ import { useQueryState, parseAsString } from "nuqs"
 interface ProjectBoardViewProps {
   projectId: string
   projectName: string
+  currentUserId: string
+  currentUserRole: string
 }
 
-export function ProjectBoardView({ projectId, projectName }: ProjectBoardViewProps) {
+export function ProjectBoardView({ projectId, projectName, currentUserId, currentUserRole }: ProjectBoardViewProps) {
   useTaskRealtime(projectId)
 
   const [search] = useQueryState("search", parseAsString.withDefault(""))
@@ -92,12 +94,14 @@ export function ProjectBoardView({ projectId, projectName }: ProjectBoardViewPro
             ))}
           </div>
         ) : (
-          <KanbanBoard 
+          <KanbanBoard
             projectId={projectId}
-            tasks={tasks} 
-            onReorder={(tasks) => reorderTasks({ 
-              tasks: tasks.map(t => ({ id: t.id, status: t.status, position: t.position })) 
-            })} 
+            tasks={tasks}
+            onReorder={(tasks) => reorderTasks({
+              tasks: tasks.map(t => ({ id: t.id, status: t.status, position: t.position }))
+            })}
+            currentUserId={currentUserId}
+            currentUserRole={currentUserRole}
           />
         )}
       </div>

@@ -46,7 +46,12 @@ export default async function ProjectPage({
 
   return (
     <div className="h-[calc(100vh-4rem)] px-6 pr-0">
-      <ProjectBoardView projectId={project.id} projectName={project.name} />
+      <ProjectBoardView
+        projectId={project.id}
+        projectName={project.name}
+        currentUserId={user.id}
+        currentUserRole={member.role}
+      />
     </div>
   )
 }

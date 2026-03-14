@@ -69,7 +69,39 @@ export async function GET(
     return NextResponse.json({ error: tasksError.message }, { status: 500 })
   }
 
-  return NextResponse.json({ data: tasks })
+  if (!tasks || tasks.length === 0) {
+    return NextResponse.json({ data: [] })
+  }
+
+  // Fetch subtask and comment counts in two batch queries
+  const taskIds = tasks.map((t) => t.id)
+
+  const [{ data: subtaskRows }, { data: commentRows }] = await Promise.all([
+    supabase.from('subtasks').select('task_id, completed').in('task_id', taskIds),
+    supabase.from('task_comments').select('task_id').in('task_id', taskIds),
+  ])
+
+  const subtaskCountMap = new Map<string, { total: number; completed: number }>()
+  for (const row of subtaskRows ?? []) {
+    const entry = subtaskCountMap.get(row.task_id) ?? { total: 0, completed: 0 }
+    entry.total++
+    if (row.completed) entry.completed++
+    subtaskCountMap.set(row.task_id, entry)
+  }
+
+  const commentCountMap = new Map<string, number>()
+  for (const row of commentRows ?? []) {
+    commentCountMap.set(row.task_id, (commentCountMap.get(row.task_id) ?? 0) + 1)
+  }
+
+  const enriched = tasks.map((t) => ({
+    ...t,
+    subtask_count: subtaskCountMap.get(t.id)?.total ?? 0,
+    completed_subtask_count: subtaskCountMap.get(t.id)?.completed ?? 0,
+    comment_count: commentCountMap.get(t.id) ?? 0,
+  }))
+
+  return NextResponse.json({ data: enriched })
 }
 
 // POST /api/projects/[projectId]/tasks

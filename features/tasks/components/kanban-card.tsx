@@ -5,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities"
 import { TaskRow } from "../hooks/use-tasks"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { CalendarIcon, GripVertical } from "lucide-react"
+import { CalendarIcon, GripVertical, CheckSquare, MessageSquare } from "lucide-react"
 import { priorityConfig } from "../utils"
 
 interface KanbanCardProps {
@@ -82,17 +82,27 @@ export function KanbanCard({ task, onClick }: KanbanCardProps) {
       </div>
 
       <div className="mt-auto flex items-end justify-between pt-2">
-        <div className="flex items-center text-xs text-muted-foreground min-h-6">
+        <div className="flex items-center gap-2.5 text-xs text-muted-foreground min-h-6">
           {task.due_date && (
-            <>
-              <CalendarIcon className="mr-1.5 size-3.5" />
-              <span>
-                {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(task.due_date))}
-              </span>
-            </>
+            <span className="flex items-center gap-1">
+              <CalendarIcon className="size-3.5" />
+              {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(task.due_date))}
+            </span>
+          )}
+          {task.subtask_count > 0 && (
+            <span className="flex items-center gap-1">
+              <CheckSquare className="size-3.5" />
+              {task.completed_subtask_count}/{task.subtask_count}
+            </span>
+          )}
+          {task.comment_count > 0 && (
+            <span className="flex items-center gap-1">
+              <MessageSquare className="size-3.5" />
+              {task.comment_count}
+            </span>
           )}
         </div>
-        
+
         <div className="flex items-center ml-auto">
           {task.assignee ? (
             <Avatar className="size-6 border">

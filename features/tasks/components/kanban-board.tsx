@@ -25,9 +25,11 @@ interface KanbanBoardProps {
   projectId: string
   tasks: TaskRow[]
   onReorder: (tasks: TaskRow[]) => void
+  currentUserId: string
+  currentUserRole: string
 }
 
-export function KanbanBoard({ projectId, tasks: initialTasks, onReorder }: KanbanBoardProps) {
+export function KanbanBoard({ projectId, tasks: initialTasks, onReorder, currentUserId, currentUserRole }: KanbanBoardProps) {
   const {
     tasks,
     activeTask,
@@ -74,6 +76,8 @@ export function KanbanBoard({ projectId, tasks: initialTasks, onReorder }: Kanba
         task={selectedTask}
         open={!!selectedTask}
         onOpenChange={(open) => !open && setSelectedTask(null)}
+        currentUserId={currentUserId}
+        currentUserRole={currentUserRole}
       />
     </DndContext>
   )

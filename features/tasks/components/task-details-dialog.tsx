@@ -11,18 +11,23 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { CalendarIcon, Clock, Flag, CheckCircle2, User, LayoutList, Maximize, Minimize, Edit2, Trash2 } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 import { priorityConfig, statusLabels } from "../utils"
 import { useTaskDetailsDialog } from "../hooks/use-task-details-dialog"
 import { EditTaskDialog } from "./edit-task-dialog"
+import { SubtaskList } from "./subtask-list"
+import { CommentList } from "./comment-list"
 
 interface TaskDetailsDialogProps {
   task: TaskRow | null
   open: boolean
   onOpenChange: (open: boolean) => void
+  currentUserId: string
+  currentUserRole: string
 }
 
-export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialogProps) {
+export function TaskDetailsDialog({ task, open, onOpenChange, currentUserId, currentUserRole }: TaskDetailsDialogProps) {
   const {
     isExpanded,
     setIsExpanded,
@@ -105,6 +110,18 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
                 </div>
               )}
             </div>
+
+            <Separator />
+
+            <SubtaskList taskId={task.id} />
+
+            <Separator />
+
+            <CommentList
+              taskId={task.id}
+              currentUserId={currentUserId}
+              currentUserRole={currentUserRole}
+            />
           </div>
 
           {/* Properties Footer */}

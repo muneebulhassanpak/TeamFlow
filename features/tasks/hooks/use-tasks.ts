@@ -28,6 +28,9 @@ export interface TaskRow {
     avatar_url: string | null
     email: string
   }
+  subtask_count: number
+  completed_subtask_count: number
+  comment_count: number
 }
 
 export interface TasksQueryParams extends Record<string, unknown> {
