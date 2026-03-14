@@ -156,33 +156,33 @@ const PLANS = [
 const KANBAN_COLUMNS = [
   {
     label: "Todo",
-    color: "text-muted-foreground",
+    dotColor: "bg-muted-foreground/50",
     cards: [
-      { title: "Design landing page", priority: "high", priorityColor: "text-orange-500" },
-      { title: "Set up CI pipeline", priority: "medium", priorityColor: "text-yellow-500" },
+      { title: "Design landing page", priorityColor: "bg-orange-500", assignee: "MU", date: "Mar 18" },
+      { title: "Set up CI pipeline", priorityColor: "bg-yellow-500", assignee: "AK", date: "Mar 20" },
     ],
   },
   {
     label: "In Progress",
-    color: "text-blue-500",
+    dotColor: "bg-blue-500",
     cards: [
-      { title: "Build auth module", priority: "urgent", priorityColor: "text-destructive" },
-      { title: "Write API docs", priority: "low", priorityColor: "text-muted-foreground" },
+      { title: "Build auth module", priorityColor: "bg-destructive", assignee: "JS", date: "Mar 16" },
+      { title: "Write API docs", priorityColor: "bg-muted-foreground/40", assignee: "MU", date: "Mar 22" },
     ],
   },
   {
     label: "In Review",
-    color: "text-yellow-500",
+    dotColor: "bg-yellow-500",
     cards: [
-      { title: "Kanban drag & drop", priority: "high", priorityColor: "text-orange-500" },
+      { title: "Kanban drag & drop", priorityColor: "bg-orange-500", assignee: "AK", date: "Mar 15" },
     ],
   },
   {
     label: "Done",
-    color: "text-emerald-500",
+    dotColor: "bg-emerald-500",
     cards: [
-      { title: "Database schema", priority: "high", priorityColor: "text-orange-500" },
-      { title: "Invite flow", priority: "medium", priorityColor: "text-yellow-500" },
+      { title: "Database schema", priorityColor: "bg-orange-500", assignee: "JS", date: "Mar 10" },
+      { title: "Invite flow", priorityColor: "bg-yellow-500", assignee: "MU", date: "Mar 12" },
     ],
   },
 ]
@@ -226,9 +226,9 @@ function HeroSection() {
       />
       {/* Colour orbs */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
-        <div className="absolute -right-40 top-20 h-[400px] w-[400px] rounded-full bg-violet-500/8 blur-[100px]" />
-        <div className="absolute bottom-0 left-1/2 h-[300px] w-[600px] -translate-x-1/2 rounded-full bg-primary/5 blur-[80px]" />
+        <div className="absolute -left-40 top-0 h-125 w-125 rounded-full bg-primary/10 blur-[120px]" />
+        <div className="absolute -right-40 top-20 h-100 w-100 rounded-full bg-violet-500/8 blur-[100px]" />
+        <div className="absolute bottom-0 left-1/2 h-75 w-150 -translate-x-1/2 rounded-full bg-primary/5 blur-[80px]" />
       </div>
 
       <div className="mx-auto max-w-5xl px-6 text-center">
@@ -237,7 +237,7 @@ function HeroSection() {
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="mb-8 inline-flex items-center gap-2 rounded-full border bg-background/80 px-4 py-1.5 text-sm backdrop-blur-sm"
+          className="mb-4 inline-flex items-center gap-2 rounded-full border bg-background/80 px-4 py-1.5 text-sm backdrop-blur-sm"
         >
           <span className="relative flex size-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
@@ -254,7 +254,7 @@ function HeroSection() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
-          className="mx-auto mb-6 max-w-3xl text-5xl font-bold tracking-tight sm:text-6xl md:text-7xl"
+          className="mx-auto mb-3 max-w-3xl text-5xl font-bold tracking-tight sm:text-6xl md:text-7xl"
         >
           Ship projects{" "}
           <span className="bg-gradient-to-br from-primary via-primary to-primary/50 bg-clip-text text-transparent">
@@ -268,7 +268,7 @@ function HeroSection() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
-          className="mx-auto mb-10 max-w-lg text-lg text-muted-foreground"
+          className="mx-auto mb-6 max-w-lg text-lg text-muted-foreground"
         >
           TeamFlow unifies your team with real-time Kanban boards, smart task
           management, and deep collaboration — all in one place.
@@ -284,7 +284,7 @@ function HeroSection() {
           <Button size="lg" className="group h-12 px-7 text-base" asChild>
             <Link href="/signup">
               Get started free
-              <ArrowRight className="ml-2 size-4 transition-transform duration-200 group-hover:translate-x-1" />
+              <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
             </Link>
           </Button>
           <Button
@@ -302,7 +302,7 @@ function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-10 flex flex-wrap items-center justify-center gap-8"
+          className="mt-6 flex flex-wrap items-center justify-center gap-8"
         >
           {STATS.map((stat) => (
             <div key={stat.label} className="text-center">
@@ -312,73 +312,115 @@ function HeroSection() {
           ))}
         </motion.div>
 
-        {/* Kanban mockup */}
+        {/* App mockup */}
         <motion.div
           initial={{ opacity: 0, y: 48, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.7, delay: 0.5, ease: "easeOut" }}
-          className="relative mx-auto mt-16 max-w-4xl"
+          className="relative mx-auto mt-14 max-w-5xl"
         >
-          {/* Glow behind mockup */}
-          <div className="absolute inset-x-10 -top-4 h-12 rounded-full bg-primary/20 blur-2xl" />
-          <div className="overflow-hidden rounded-2xl border border-border/60 bg-background/80 shadow-2xl backdrop-blur-sm">
+          {/* Glow */}
+          <div className="absolute inset-x-20 -top-6 h-16 rounded-full bg-primary/20 blur-3xl" />
+          <div className="absolute -bottom-6 inset-x-20 h-16 rounded-full bg-violet-500/10 blur-3xl" />
+
+          <div className="overflow-hidden rounded-2xl border border-border/50 bg-background shadow-2xl">
             {/* Window chrome */}
-            <div className="flex items-center gap-1.5 border-b border-border/60 bg-muted/40 px-4 py-3">
-              <div className="size-3 rounded-full bg-destructive/50" />
-              <div className="size-3 rounded-full bg-yellow-400/50" />
-              <div className="size-3 rounded-full bg-emerald-400/50" />
-              <div className="ml-3 flex h-5 flex-1 max-w-48 items-center justify-center rounded-md bg-muted/60 px-3">
-                <span className="text-[10px] text-muted-foreground">
+            <div className="flex items-center gap-1.5 border-b border-border/50 bg-muted/60 px-4 py-2.5">
+              <div className="size-2.5 rounded-full bg-destructive/60" />
+              <div className="size-2.5 rounded-full bg-yellow-400/60" />
+              <div className="size-2.5 rounded-full bg-emerald-400/60" />
+              <div className="mx-auto flex h-4 w-52 items-center justify-center rounded bg-background/60 px-2">
+                <span className="text-[9px] text-muted-foreground">
                   teamflow.app/acme/projects/sprint-14
                 </span>
               </div>
             </div>
-            {/* Board */}
-            <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-4">
-              {KANBAN_COLUMNS.map((col, colIndex) => (
-                <motion.div
-                  key={col.label}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.4,
-                    delay: 0.6 + colIndex * 0.07,
-                  }}
-                  className="rounded-xl bg-muted/30 p-2.5"
-                >
-                  <div className="mb-2.5 flex items-center justify-between">
-                    <p
-                      className={`text-[11px] font-semibold uppercase tracking-wide ${col.color}`}
-                    >
-                      {col.label}
-                    </p>
-                    <span className="text-[10px] text-muted-foreground">
-                      {col.cards.length}
+
+            <div className="flex">
+              {/* Sidebar */}
+              <div className="hidden w-11 flex-col items-center gap-3.5 border-r border-border/40 bg-muted/30 py-4 sm:flex">
+                <div className="flex size-6 items-center justify-center rounded-md bg-primary/20">
+                  <div className="size-3 rounded-sm bg-primary/60" />
+                </div>
+                {["bg-blue-500/25", "bg-violet-500/25", "bg-emerald-500/25", "bg-muted-foreground/20", "bg-muted-foreground/20"].map(
+                  (c, i) => (
+                    <div key={i} className={`size-5 rounded-md ${c}`} />
+                  )
+                )}
+              </div>
+
+              <div className="min-w-0 flex-1">
+                {/* Toolbar */}
+                <div className="flex items-center justify-between border-b border-border/40 bg-muted/10 px-4 py-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-semibold">Sprint 14</span>
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-[9px] text-muted-foreground">
+                      7 tasks
                     </span>
                   </div>
-                  <div className="space-y-2">
-                    {col.cards.map((card) => (
-                      <div
-                        key={card.title}
-                        className="rounded-lg border border-border/60 bg-background p-2.5 text-left shadow-sm"
-                      >
-                        <p className="text-[11px] font-medium leading-snug text-foreground">
-                          {card.title}
-                        </p>
-                        <span
-                          className={`mt-1.5 inline-flex rounded px-1.5 py-0.5 text-[9px] font-bold uppercase ${card.priorityColor} bg-current/5`}
-                        >
-                          {card.priority}
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-4 w-4 rounded bg-muted/60" />
+                    <div className="h-4 w-4 rounded bg-muted/60" />
+                    <div className="rounded-full bg-primary px-2 py-0.5 text-[9px] font-medium text-primary-foreground">
+                      + New task
+                    </div>
+                  </div>
+                </div>
+
+                {/* Board */}
+                <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-4">
+                  {KANBAN_COLUMNS.map((col, colIndex) => (
+                    <motion.div
+                      key={col.label}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, delay: 0.65 + colIndex * 0.07 }}
+                      className="rounded-xl bg-muted/25 p-2"
+                    >
+                      {/* Column header */}
+                      <div className="mb-2 flex items-center justify-between px-0.5">
+                        <div className="flex items-center gap-1.5">
+                          <div className={`size-1.5 rounded-full ${col.dotColor}`} />
+                          <span className="text-[10px] font-semibold text-foreground/70">
+                            {col.label}
+                          </span>
+                        </div>
+                        <span className="text-[9px] text-muted-foreground">
+                          {col.cards.length}
                         </span>
                       </div>
-                    ))}
-                  </div>
-                </motion.div>
-              ))}
+                      {/* Cards */}
+                      <div className="space-y-1.5">
+                        {col.cards.map((card) => (
+                          <div
+                            key={card.title}
+                            className="rounded-lg border border-border/50 bg-background p-2 text-left shadow-sm"
+                          >
+                            <p className="text-[10px] font-medium leading-snug text-foreground">
+                              {card.title}
+                            </p>
+                            <div className="mt-1.5 flex items-center justify-between">
+                              <div className={`size-1.5 rounded-full ${card.priorityColor}`} />
+                              <div className="flex items-center gap-1">
+                                <span className="text-[8px] text-muted-foreground">
+                                  {card.date}
+                                </span>
+                                <div className="flex size-3.5 items-center justify-center rounded-full bg-primary/15 text-[7px] font-bold text-primary">
+                                  {card.assignee.charAt(0)}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
           {/* Bottom fade */}
-          <div className="absolute inset-x-0 bottom-0 h-16 rounded-b-2xl bg-gradient-to-t from-background to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-20 rounded-b-2xl bg-gradient-to-t from-background to-transparent" />
         </motion.div>
       </div>
     </section>
@@ -389,6 +431,9 @@ function HeroSection() {
 
 function FeaturesSection() {
   const [largeFeature, ...rest] = FEATURES
+  const lastFeature = rest[rest.length - 1]
+  const LastIcon = lastFeature.icon
+  const middleFeatures = rest.slice(0, -1)
 
   return (
     <section id="features" className="border-t py-24 md:py-32">
@@ -472,17 +517,15 @@ function FeaturesSection() {
             </Card>
           </motion.div>
 
-          {/* Small cards */}
-          {rest.map((feature) => (
+          {/* Small cards — first 4 */}
+          {middleFeatures.map((feature) => (
             <motion.div key={feature.title} variants={fadeUp}>
-              <Card
-                className={`group h-full cursor-default border-border/60 transition-all duration-300 hover:border-${feature.accent.replace("text-", "")}/40 hover:shadow-md`}
-              >
+              <Card className="group h-full cursor-default border-border/60 transition-all duration-300 hover:shadow-md">
                 <CardHeader>
                   <div
                     className={`mb-3 flex size-10 items-center justify-center rounded-xl ${feature.bg} ${feature.accent}`}
                   >
-                    <feature.icon className="size-4.5" />
+                    <feature.icon className="size-5" />
                   </div>
                   <CardTitle className="text-base">{feature.title}</CardTitle>
                   <CardDescription className="text-sm leading-relaxed">
@@ -492,6 +535,30 @@ function FeaturesSection() {
               </Card>
             </motion.div>
           ))}
+
+          {/* Last card — spans full row */}
+          <motion.div
+            variants={fadeUp}
+            className="sm:col-span-2 lg:col-span-3"
+          >
+            <Card className="group h-full cursor-default border-border/60 transition-all duration-300 hover:shadow-md">
+              <CardHeader className="sm:flex-row sm:items-start sm:gap-6">
+                <div
+                  className={`mb-3 flex size-11 shrink-0 items-center justify-center rounded-xl sm:mb-0 ${lastFeature.bg} ${lastFeature.accent}`}
+                >
+                  <LastIcon className="size-5" />
+                </div>
+                <div>
+                  <CardTitle className="mb-1.5 text-base">
+                    {lastFeature.title}
+                  </CardTitle>
+                  <CardDescription className="text-sm leading-relaxed">
+                    {lastFeature.description}
+                  </CardDescription>
+                </div>
+              </CardHeader>
+            </Card>
+          </motion.div>
         </motion.div>
       </div>
     </section>
@@ -530,9 +597,18 @@ function PricingSection() {
           className="grid gap-6 md:grid-cols-3 md:items-stretch"
         >
           {PLANS.map((plan) => (
-            <motion.div key={plan.name} variants={fadeUp} className="flex">
+            <motion.div
+              key={plan.name}
+              variants={fadeUp}
+              className={`relative flex ${plan.highlighted ? "pt-4" : ""}`}
+            >
+              {plan.highlighted && (
+                <div className="absolute top-0 left-1/2 z-10 -translate-x-1/2">
+                  <Badge className="shadow-sm">Most popular</Badge>
+                </div>
+              )}
               <Card
-                className={`relative flex w-full flex-col overflow-hidden transition-shadow duration-300 ${
+                className={`relative flex w-full flex-col transition-shadow duration-300 ${
                   plan.highlighted
                     ? "border-primary shadow-xl shadow-primary/10"
                     : "border-border/60 hover:shadow-md"
@@ -543,9 +619,6 @@ function PricingSection() {
                     {/* Gradient top bar */}
                     <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-primary/40 via-primary to-primary/40" />
                     <div className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/[0.03] to-transparent" />
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                      <Badge className="shadow-sm">Most popular</Badge>
-                    </div>
                   </>
                 )}
                 <CardHeader className="pb-4 pt-8">
@@ -635,7 +708,7 @@ function CtaSection() {
             <Button size="lg" className="group h-12 px-8 text-base" asChild>
               <Link href="/signup">
                 Start for free
-                <ArrowRight className="ml-2 size-4 transition-transform duration-200 group-hover:translate-x-1" />
+                <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
             </Button>
             <Button
