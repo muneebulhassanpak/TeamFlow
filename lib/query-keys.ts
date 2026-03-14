@@ -34,7 +34,10 @@ export const taskKeys = {
 }
 
 export const activityKeys = {
-  org: (orgId: string) => ['activity', 'org', orgId] as const,
+  org: (orgId: string, filters?: Record<string, unknown>) =>
+    filters !== undefined
+      ? (['activity', 'org', orgId, filters] as const)
+      : (['activity', 'org', orgId] as const),
   project: (projectId: string) => ['activity', 'project', projectId] as const,
 }
 
