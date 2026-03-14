@@ -39,7 +39,7 @@ export function DashboardMyTasks({ userId }: DashboardMyTasksProps) {
     .slice(0, 5)
 
   return (
-    <Card>
+    <Card className="gap-2">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-base">My Open Tasks</CardTitle>
         <Link

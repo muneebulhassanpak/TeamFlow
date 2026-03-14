@@ -20,7 +20,7 @@ export function DashboardProjects() {
   const projects = data?.data ?? []
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col gap-2">
       <CardHeader className="flex flex-row items-center justify-between pb-3">
         <CardTitle className="text-base">Active Projects</CardTitle>
         <Link

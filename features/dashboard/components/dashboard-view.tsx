@@ -42,7 +42,7 @@ export function DashboardView({ userId }: { userId: string }) {
       {/* Main content */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Recent Activity */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 gap-2">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-base">Recent Activity</CardTitle>
             <Link
