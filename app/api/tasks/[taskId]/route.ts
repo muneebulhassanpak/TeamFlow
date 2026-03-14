@@ -29,7 +29,7 @@ export async function PUT(
   // First verify task exists and user has access to its org
   const { data: task, error: taskError } = await supabase
     .from("tasks")
-    .select("org_id, project_id, title")
+    .select("org_id, project_id, title, assignee_id")
     .eq("id", taskId)
     .single()
 
@@ -68,6 +68,19 @@ export async function PUT(
     entity_id: taskId,
     meta: { title: validation.data.title ?? task.title, updates: validation.data }
   })
+
+  // Notify new assignee if assignee changed
+  const newAssigneeId = validation.data.assignee_id
+  if (newAssigneeId && newAssigneeId !== task.assignee_id && newAssigneeId !== user.id) {
+    await supabase.from("notifications").insert({
+      user_id: newAssigneeId,
+      org_id: task.org_id,
+      type: "task.assigned",
+      title: `You were assigned "${validation.data.title ?? task.title}"`,
+      body: null,
+      link: null,
+    })
+  }
 
   return NextResponse.json({ data: updatedTask })
 }
