@@ -66,17 +66,17 @@ export function Navbar({ userId }: NavbarProps) {
       <NotificationBell userId={userId} />
 
       <Button
-        variant="ghost"
-        size="icon"
-        className="size-8 text-muted-foreground hover:text-destructive"
+        variant="outline"
+        size="sm"
+        className="gap-2 text-muted-foreground hover:text-destructive"
         onClick={() => signout.mutate()}
         disabled={signout.isPending || signout.isSuccess}
-        aria-label="Sign out"
       >
         {signout.isPending || signout.isSuccess
           ? <Loader2 className="size-4 animate-spin" />
           : <LogOut className="size-4" />
         }
+        Sign out
       </Button>
     </header>
   )
