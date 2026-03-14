@@ -47,8 +47,8 @@ export async function GET(req: NextRequest) {
     role: m.role,
     joined_at: m.joined_at,
     email: emailMap[m.user_id] ?? '',
-    full_name: (m.profiles as { full_name: string | null } | null)?.full_name ?? null,
-    avatar_url: (m.profiles as { avatar_url: string | null } | null)?.avatar_url ?? null,
+    full_name: m.profiles?.full_name ?? null,
+    avatar_url: m.profiles?.avatar_url ?? null,
   }))
 
   // Server-side search
