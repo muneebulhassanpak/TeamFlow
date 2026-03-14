@@ -8,6 +8,7 @@ import { useDashboardStats, useDashboardActivity } from '@/features/dashboard/ho
 import { StatCards } from './stat-cards'
 import { StatCardsSkeleton } from './stat-cards-skeleton'
 import { DashboardProjects } from './dashboard-projects'
+import { DashboardMyTasks } from './dashboard-my-tasks'
 import { ActivityFeed } from '@/features/activity/components/activity-feed'
 import { ActivityFeedSkeleton } from '@/features/activity/components/activity-feed-skeleton'
 
@@ -19,7 +20,7 @@ function getGreeting() {
 }
 
 
-export function DashboardView() {
+export function DashboardView({ userId }: { userId: string }) {
   const { org } = useOrg()
   const { data: stats, isLoading: statsLoading } = useDashboardStats(org.id)
   const { data: activity, isLoading: activityLoading } = useDashboardActivity(org.id)
@@ -63,6 +64,9 @@ export function DashboardView() {
         {/* Active Projects */}
         <DashboardProjects />
       </div>
+
+      {/* My Open Tasks */}
+      <DashboardMyTasks userId={userId} />
     </div>
   )
 }
