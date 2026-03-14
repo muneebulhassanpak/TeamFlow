@@ -44,7 +44,7 @@ export async function GET(
     .from("tasks")
     .select(`
       *,
-      assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url, email)
+      assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url)
     `)
     .eq("project_id", projectId)
     .order("position", { ascending: true })
