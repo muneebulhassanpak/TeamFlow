@@ -3,18 +3,13 @@ import { Card } from '@/components/ui/card'
 
 export function StatCardsSkeleton() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <Card className="grid grid-cols-2 divide-x divide-y divide-border lg:grid-cols-4 lg:divide-y-0">
       {Array.from({ length: 4 }).map((_, i) => (
-        <Card key={i} className="p-4">
-          <div className="flex items-center gap-3">
-            <Skeleton className="size-9 shrink-0 rounded-lg" />
-            <div className="space-y-1.5">
-              <Skeleton className="h-3 w-24" />
-              <Skeleton className="h-7 w-10" />
-            </div>
-          </div>
-        </Card>
+        <div key={i} className="flex flex-col gap-1.5 px-5 py-4">
+          <Skeleton className="h-3.5 w-28" />
+          <Skeleton className="h-7 w-12" />
+        </div>
       ))}
-    </div>
+    </Card>
   )
 }
