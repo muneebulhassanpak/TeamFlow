@@ -1,7 +1,8 @@
 'use client'
 
 import * as React from 'react'
-import { Sidebar } from './sidebar'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { AppSidebar } from '@/components/app-sidebar'
 import { Navbar } from './navbar'
 
 interface AppShellProps {
@@ -12,25 +13,17 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, userEmail, userFullName, userAvatarUrl }: AppShellProps) {
-  const [collapsed, setCollapsed] = React.useState(false)
-
   return (
-    <div className="flex h-svh overflow-hidden">
-      {/* Sidebar — hidden on mobile, visible md+ */}
-      <div className="hidden md:flex">
-        <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
-      </div>
-
-      {/* Main column */}
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
         <Navbar
           userEmail={userEmail}
           userFullName={userFullName}
           userAvatarUrl={userAvatarUrl}
-          onToggleSidebar={() => setCollapsed((c) => !c)}
         />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
-      </div>
-    </div>
+        <div className="flex flex-1 flex-col gap-4 p-6">{children}</div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

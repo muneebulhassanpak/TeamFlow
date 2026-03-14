@@ -1,8 +1,8 @@
 'use client'
 
 import * as React from 'react'
-import { useRouter } from 'next/navigation'
-import { LogOut, Menu, User } from 'lucide-react'
+import { useRouter, usePathname } from 'next/navigation'
+import { LogOut, User } from 'lucide-react'
 import { createBrowserClient } from '@supabase/ssr'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -15,15 +15,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Sidebar } from './sidebar'
+import { Separator } from '@/components/ui/separator'
+import { SidebarTrigger } from '@/components/ui/sidebar'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
 import { useOrg } from '@/features/app-shell/context/org-context'
 
 interface NavbarProps {
   userEmail: string
   userFullName: string | null
   userAvatarUrl: string | null
-  onToggleSidebar?: () => void
 }
 
 function getInitials(name: string | null, email: string): string {
@@ -35,11 +42,27 @@ function getInitials(name: string | null, email: string): string {
   return email.slice(0, 2).toUpperCase()
 }
 
-export function Navbar({ userEmail, userFullName, userAvatarUrl, onToggleSidebar }: NavbarProps) {
+const SEGMENT_LABELS: Record<string, string> = {
+  dashboard: 'Dashboard',
+  projects: 'Projects',
+  'my-tasks': 'My Tasks',
+  members: 'Members',
+  activity: 'Activity',
+  settings: 'Settings',
+}
+
+function useBreadcrumb(orgSlug: string) {
+  const pathname = usePathname()
+  // pathname = /orgSlug/segment/...
+  const parts = pathname.split('/').filter(Boolean) // [orgSlug, segment, ...]
+  const segment = parts[1] ?? 'dashboard'
+  return SEGMENT_LABELS[segment] ?? segment
+}
+
+export function Navbar({ userEmail, userFullName, userAvatarUrl }: NavbarProps) {
   const router = useRouter()
   const { org } = useOrg()
-  const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false)
-
+  const currentPage = useBreadcrumb(org.slug)
   const initials = getInitials(userFullName, userEmail)
 
   async function handleSignOut() {
@@ -53,39 +76,23 @@ export function Navbar({ userEmail, userFullName, userAvatarUrl, onToggleSidebar
   }
 
   return (
-    <header className="bg-background border-border flex h-14 shrink-0 items-center gap-3 border-b px-4">
-      {/* Mobile sidebar toggle */}
-      <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
-        <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="size-4" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="w-56 p-0">
-          <Sidebar collapsed={false} onToggle={() => setMobileSidebarOpen(false)} />
-        </SheetContent>
-      </Sheet>
+    <header className="flex h-14 shrink-0 items-center gap-2 px-4">
+      <SidebarTrigger className="-ml-1" />
+      <Separator orientation="vertical" className="mr-1 data-[orientation=vertical]:h-4" />
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem className="hidden md:block">
+            <BreadcrumbLink href={`/${org.slug}/dashboard`}>{org.name}</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator className="hidden md:block" />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{currentPage}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
-      {/* Desktop sidebar toggle */}
-      {onToggleSidebar && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="hidden size-8 md:flex"
-          onClick={onToggleSidebar}
-          aria-label="Toggle sidebar"
-        >
-          <Menu className="size-4" />
-        </Button>
-      )}
-
-      {/* Breadcrumb / org name */}
-      <span className="text-muted-foreground text-sm font-medium">{org.name}</span>
-
-      {/* Spacer */}
       <div className="flex-1" />
 
-      {/* User menu */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 rounded-full p-0">
