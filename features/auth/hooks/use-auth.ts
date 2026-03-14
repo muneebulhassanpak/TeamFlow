@@ -36,7 +36,7 @@ export function useSignup() {
         password,
         options: {
           data: { full_name: fullName },
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/confirm`,
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
         },
       })
       if (error) throw new Error(error.message)
