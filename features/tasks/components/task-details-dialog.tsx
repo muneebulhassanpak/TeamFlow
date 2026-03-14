@@ -99,7 +99,7 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
 
         <div className="flex flex-col h-full max-h-[85vh]">
           {/* Main Content Area */}
-          <div className="flex-1 overflow-y-auto px-6 py-8 flex flex-col gap-8">
+          <div className="flex-1 overflow-y-auto px-6 py-8 flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground mb-1">
                 <span className="flex items-center gap-1.5 uppercase tracking-wider">
