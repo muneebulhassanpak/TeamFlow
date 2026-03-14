@@ -158,31 +158,66 @@ const KANBAN_COLUMNS = [
     label: "Todo",
     dotColor: "bg-muted-foreground/50",
     cards: [
-      { title: "Design landing page", priorityColor: "bg-orange-500", assignee: "MU", date: "Mar 18" },
-      { title: "Set up CI pipeline", priorityColor: "bg-yellow-500", assignee: "AK", date: "Mar 20" },
+      {
+        title: "Design landing page",
+        priorityColor: "bg-orange-500",
+        assignee: "MU",
+        date: "Mar 18",
+      },
+      {
+        title: "Set up CI pipeline",
+        priorityColor: "bg-yellow-500",
+        assignee: "AK",
+        date: "Mar 20",
+      },
     ],
   },
   {
     label: "In Progress",
     dotColor: "bg-blue-500",
     cards: [
-      { title: "Build auth module", priorityColor: "bg-destructive", assignee: "JS", date: "Mar 16" },
-      { title: "Write API docs", priorityColor: "bg-muted-foreground/40", assignee: "MU", date: "Mar 22" },
+      {
+        title: "Build auth module",
+        priorityColor: "bg-destructive",
+        assignee: "JS",
+        date: "Mar 16",
+      },
+      {
+        title: "Write API docs",
+        priorityColor: "bg-muted-foreground/40",
+        assignee: "MU",
+        date: "Mar 22",
+      },
     ],
   },
   {
     label: "In Review",
     dotColor: "bg-yellow-500",
     cards: [
-      { title: "Kanban drag & drop", priorityColor: "bg-orange-500", assignee: "AK", date: "Mar 15" },
+      {
+        title: "Kanban drag & drop",
+        priorityColor: "bg-orange-500",
+        assignee: "AK",
+        date: "Mar 15",
+      },
     ],
   },
   {
     label: "Done",
     dotColor: "bg-emerald-500",
     cards: [
-      { title: "Database schema", priorityColor: "bg-orange-500", assignee: "JS", date: "Mar 10" },
-      { title: "Invite flow", priorityColor: "bg-yellow-500", assignee: "MU", date: "Mar 12" },
+      {
+        title: "Database schema",
+        priorityColor: "bg-orange-500",
+        assignee: "JS",
+        date: "Mar 10",
+      },
+      {
+        title: "Invite flow",
+        priorityColor: "bg-yellow-500",
+        assignee: "MU",
+        date: "Mar 12",
+      },
     ],
   },
 ]
@@ -226,8 +261,8 @@ function HeroSection() {
       />
       {/* Colour orbs */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -left-40 top-0 h-125 w-125 rounded-full bg-primary/10 blur-[120px]" />
-        <div className="absolute -right-40 top-20 h-100 w-100 rounded-full bg-violet-500/8 blur-[100px]" />
+        <div className="absolute top-0 -left-40 h-125 w-125 rounded-full bg-primary/10 blur-[120px]" />
+        <div className="absolute top-20 -right-40 h-100 w-100 rounded-full bg-violet-500/8 blur-[100px]" />
         <div className="absolute bottom-0 left-1/2 h-75 w-150 -translate-x-1/2 rounded-full bg-primary/5 blur-[80px]" />
       </div>
 
@@ -257,7 +292,7 @@ function HeroSection() {
           className="mx-auto mb-3 max-w-3xl text-5xl font-bold tracking-tight sm:text-6xl md:text-7xl"
         >
           Ship projects{" "}
-          <span className="bg-gradient-to-br from-primary via-primary to-primary/50 bg-clip-text text-transparent">
+          <span className="bg-linear-to-t from-primary via-primary to-primary/50 bg-clip-text text-transparent">
             faster
           </span>
           <br />
@@ -321,7 +356,7 @@ function HeroSection() {
         >
           {/* Glow */}
           <div className="absolute inset-x-20 -top-6 h-16 rounded-full bg-primary/20 blur-3xl" />
-          <div className="absolute -bottom-6 inset-x-20 h-16 rounded-full bg-violet-500/10 blur-3xl" />
+          <div className="absolute inset-x-20 -bottom-6 h-16 rounded-full bg-violet-500/10 blur-3xl" />
 
           <div className="overflow-hidden rounded-2xl border border-border/50 bg-background shadow-2xl">
             {/* Window chrome */}
@@ -342,11 +377,15 @@ function HeroSection() {
                 <div className="flex size-6 items-center justify-center rounded-md bg-primary/20">
                   <div className="size-3 rounded-sm bg-primary/60" />
                 </div>
-                {["bg-blue-500/25", "bg-violet-500/25", "bg-emerald-500/25", "bg-muted-foreground/20", "bg-muted-foreground/20"].map(
-                  (c, i) => (
-                    <div key={i} className={`size-5 rounded-md ${c}`} />
-                  )
-                )}
+                {[
+                  "bg-blue-500/25",
+                  "bg-violet-500/25",
+                  "bg-emerald-500/25",
+                  "bg-muted-foreground/20",
+                  "bg-muted-foreground/20",
+                ].map((c, i) => (
+                  <div key={i} className={`size-5 rounded-md ${c}`} />
+                ))}
               </div>
 
               <div className="min-w-0 flex-1">
@@ -374,13 +413,18 @@ function HeroSection() {
                       key={col.label}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.35, delay: 0.65 + colIndex * 0.07 }}
+                      transition={{
+                        duration: 0.35,
+                        delay: 0.65 + colIndex * 0.07,
+                      }}
                       className="rounded-xl bg-muted/25 p-2"
                     >
                       {/* Column header */}
                       <div className="mb-2 flex items-center justify-between px-0.5">
                         <div className="flex items-center gap-1.5">
-                          <div className={`size-1.5 rounded-full ${col.dotColor}`} />
+                          <div
+                            className={`size-1.5 rounded-full ${col.dotColor}`}
+                          />
                           <span className="text-[10px] font-semibold text-foreground/70">
                             {col.label}
                           </span>
@@ -396,11 +440,13 @@ function HeroSection() {
                             key={card.title}
                             className="rounded-lg border border-border/50 bg-background p-2 text-left shadow-sm"
                           >
-                            <p className="text-[10px] font-medium leading-snug text-foreground">
+                            <p className="text-[10px] leading-snug font-medium text-foreground">
                               {card.title}
                             </p>
                             <div className="mt-1.5 flex items-center justify-between">
-                              <div className={`size-1.5 rounded-full ${card.priorityColor}`} />
+                              <div
+                                className={`size-1.5 rounded-full ${card.priorityColor}`}
+                              />
                               <div className="flex items-center gap-1">
                                 <span className="text-[8px] text-muted-foreground">
                                   {card.date}
@@ -420,7 +466,7 @@ function HeroSection() {
             </div>
           </div>
           {/* Bottom fade */}
-          <div className="absolute inset-x-0 bottom-0 h-20 rounded-b-2xl bg-gradient-to-t from-background to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-20 rounded-b-2xl bg-linear-to-t from-background to-transparent" />
         </motion.div>
       </div>
     </section>
@@ -446,7 +492,7 @@ function FeaturesSection() {
           variants={fadeUp}
           className="mb-14 text-center"
         >
-          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">
+          <p className="mb-3 text-sm font-semibold tracking-widest text-primary uppercase">
             Features
           </p>
           <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -467,10 +513,7 @@ function FeaturesSection() {
           className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
         >
           {/* Large card — Kanban */}
-          <motion.div
-            variants={fadeUp}
-            className="sm:col-span-2 lg:col-span-2"
-          >
+          <motion.div variants={fadeUp} className="sm:col-span-2 lg:col-span-2">
             <Card className="group h-full cursor-default overflow-hidden border-border/60 transition-all duration-300 hover:border-blue-500/40 hover:shadow-lg hover:shadow-blue-500/5">
               <CardHeader>
                 <div
@@ -500,13 +543,11 @@ function FeaturesSection() {
                     { label: "Done", color: "bg-emerald-500/20", cards: 4 },
                   ].map((col) => (
                     <div key={col.label} className="space-y-1.5">
-                      <div
-                        className={`h-1.5 w-8 rounded-full ${col.color}`}
-                      />
+                      <div className={`h-1.5 w-8 rounded-full ${col.color}`} />
                       {Array.from({ length: col.cards }).map((_, i) => (
                         <div
                           key={i}
-                          className="h-6 rounded-md bg-background/80 border border-border/30"
+                          className="h-6 rounded-md border border-border/30 bg-background/80"
                           style={{ opacity: 1 - i * 0.15 }}
                         />
                       ))}
@@ -537,10 +578,7 @@ function FeaturesSection() {
           ))}
 
           {/* Last card — spans full row */}
-          <motion.div
-            variants={fadeUp}
-            className="sm:col-span-2 lg:col-span-3"
-          >
+          <motion.div variants={fadeUp} className="sm:col-span-2 lg:col-span-3">
             <Card className="group h-full cursor-default border-border/60 transition-all duration-300 hover:shadow-md">
               <CardHeader className="sm:flex-row sm:items-start sm:gap-6">
                 <div
@@ -578,7 +616,7 @@ function PricingSection() {
           variants={fadeUp}
           className="mb-14 text-center"
         >
-          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">
+          <p className="mb-3 text-sm font-semibold tracking-widest text-primary uppercase">
             Pricing
           </p>
           <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -617,11 +655,11 @@ function PricingSection() {
                 {plan.highlighted && (
                   <>
                     {/* Gradient top bar */}
-                    <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-primary/40 via-primary to-primary/40" />
-                    <div className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/[0.03] to-transparent" />
+                    <div className="absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-primary/40 via-primary to-primary/40" />
+                    <div className="absolute inset-0 -z-10 bg-linear-to-b from-primary/300 to-transparent" />
                   </>
                 )}
-                <CardHeader className="pb-4 pt-8">
+                <CardHeader className="pt-8 pb-4">
                   <p className="text-sm font-semibold text-muted-foreground">
                     {plan.name}
                   </p>
@@ -630,7 +668,9 @@ function PricingSection() {
                       {plan.price}
                     </span>
                     {plan.period && (
-                      <span className="text-muted-foreground">{plan.period}</span>
+                      <span className="text-muted-foreground">
+                        {plan.period}
+                      </span>
                     )}
                   </div>
                   <CardDescription className="text-sm">
@@ -676,15 +716,15 @@ function CtaSection() {
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
           variants={fadeUp}
-          className="relative overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br from-muted/60 via-background to-muted/30 px-8 py-16 text-center md:px-16"
+          className="relative overflow-hidden rounded-2xl border border-border/60 bg-linear-to-br from-muted/60 via-background to-muted/30 px-8 py-16 text-center md:px-16"
         >
           {/* Background orbs */}
-          <div className="pointer-events-none absolute -left-20 -top-20 size-64 rounded-full bg-primary/10 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-20 -right-20 size-64 rounded-full bg-violet-500/8 blur-3xl" />
+          <div className="pointer-events-none absolute -top-20 -left-20 size-64 rounded-full bg-primary/10 blur-3xl" />
+          <div className="pointer-events-none absolute -right-20 -bottom-20 size-64 rounded-full bg-violet-500/8 blur-3xl" />
 
           <motion.p
             variants={fadeUp}
-            className="mb-2 text-sm font-semibold uppercase tracking-widest text-primary"
+            className="mb-2 text-sm font-semibold tracking-widest text-primary uppercase"
           >
             Get started today
           </motion.p>
