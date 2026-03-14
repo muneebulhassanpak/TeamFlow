@@ -13,7 +13,7 @@ export async function GET(
     return NextResponse.json({ error: authError ?? "Unauthorized" }, { status: 401 })
   }
 
-  const { projectId } = await params
+  const { id: projectId } = await params
   
   const searchParams = req.nextUrl.searchParams
   const priority = searchParams.get("priority")
@@ -82,7 +82,7 @@ export async function POST(
     return NextResponse.json({ error: authError ?? "Unauthorized" }, { status: 401 })
   }
 
-  const { projectId } = await params
+  const { id: projectId } = await params
   const body = await req.json()
   
   const validation = CreateTaskSchema.safeParse(body)
