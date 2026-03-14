@@ -53,48 +53,21 @@ import {
   useDeleteProject,
 } from "@/features/projects/hooks/use-projects"
 import { UpdateProjectSchema } from "@/features/projects/validations/projects"
+import type {
+  ProjectWithMembers,
+  ProjectSettingsMember,
+  OrgSettingsMember,
+} from "@/features/projects/types"
+import type { OrgRole } from "@/types"
 import { Loader2, MoreHorizontal, Plus, Trash2, UserMinus } from "lucide-react"
 import { toast } from "sonner"
 
-type Project = {
-  id: string
-  name: string
-  description: string | null
-  color: string
-  org_id: string
-  archived: boolean
-  created_at: string
-  updated_at: string
-}
-
-type ProjectMember = {
-  user_id: string
-  is_manager: boolean
-  profiles: {
-    id: string
-    email: string
-    full_name: string | null
-    avatar_url: string | null
-  }
-}
-
-type OrgMember = {
-  user_id: string
-  role: "owner" | "admin" | "member"
-  profiles: {
-    id: string
-    email: string
-    full_name: string | null
-    avatar_url: string | null
-  }
-}
-
 interface ProjectSettingsViewProps {
   orgId: string
-  project: Project
-  projectMembers: ProjectMember[]
-  orgMembers: OrgMember[]
-  currentUserRole: "owner" | "admin" | "member"
+  project: ProjectWithMembers
+  projectMembers: ProjectSettingsMember[]
+  orgMembers: OrgSettingsMember[]
+  currentUserRole: OrgRole
 }
 
 export function ProjectSettingsView({
@@ -165,10 +138,8 @@ export function ProjectSettingsView({
     }
   }
 
-  const canManageMembers =
-    currentUserRole === "owner" || currentUserRole === "admin"
-  const canDeleteProject =
-    currentUserRole === "owner" || currentUserRole === "admin"
+  const canManageMembers = currentUserRole === "admin"
+  const canDeleteProject = currentUserRole === "admin"
 
   // Get available members to add (org members not already in project)
   const availableMembers = orgMembers.filter(
@@ -291,17 +262,16 @@ export function ProjectSettingsView({
                               src={member.profiles.avatar_url || undefined}
                             />
                             <AvatarFallback>
-                              {member.profiles.full_name?.[0] ||
-                                member.profiles.email[0].toUpperCase()}
+                              {member.profiles.full_name?.[0] ??
+                                member.email[0]?.toUpperCase() ?? "?"}
                             </AvatarFallback>
                           </Avatar>
                           <div>
                             <p className="text-sm font-medium">
-                              {member.profiles.full_name ||
-                                member.profiles.email}
+                              {member.profiles.full_name ?? member.email}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {member.profiles.email}
+                              {member.email}
                             </p>
                           </div>
                         </div>
@@ -339,16 +309,16 @@ export function ProjectSettingsView({
                       src={member.profiles.avatar_url || undefined}
                     />
                     <AvatarFallback>
-                      {member.profiles.full_name?.[0] ||
-                        member.profiles.email[0].toUpperCase()}
+                      {member.profiles.full_name?.[0] ??
+                        member.email[0]?.toUpperCase() ?? "?"}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="text-sm font-medium">
-                      {member.profiles.full_name || member.profiles.email}
+                      {member.profiles.full_name ?? member.email}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {member.profiles.email}
+                      {member.email}
                     </p>
                   </div>
                 </div>
