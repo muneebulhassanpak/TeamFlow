@@ -389,6 +389,9 @@ function HeroSection() {
 
 function FeaturesSection() {
   const [largeFeature, ...rest] = FEATURES
+  const lastFeature = rest[rest.length - 1]
+  const LastIcon = lastFeature.icon
+  const middleFeatures = rest.slice(0, -1)
 
   return (
     <section id="features" className="border-t py-24 md:py-32">
@@ -472,12 +475,10 @@ function FeaturesSection() {
             </Card>
           </motion.div>
 
-          {/* Small cards */}
-          {rest.map((feature) => (
+          {/* Small cards — first 4 */}
+          {middleFeatures.map((feature) => (
             <motion.div key={feature.title} variants={fadeUp}>
-              <Card
-                className={`group h-full cursor-default border-border/60 transition-all duration-300 hover:border-${feature.accent.replace("text-", "")}/40 hover:shadow-md`}
-              >
+              <Card className="group h-full cursor-default border-border/60 transition-all duration-300 hover:shadow-md">
                 <CardHeader>
                   <div
                     className={`mb-3 flex size-10 items-center justify-center rounded-xl ${feature.bg} ${feature.accent}`}
@@ -492,6 +493,30 @@ function FeaturesSection() {
               </Card>
             </motion.div>
           ))}
+
+          {/* Last card — spans full row */}
+          <motion.div
+            variants={fadeUp}
+            className="sm:col-span-2 lg:col-span-3"
+          >
+            <Card className="group h-full cursor-default border-border/60 transition-all duration-300 hover:shadow-md">
+              <CardHeader className="sm:flex-row sm:items-start sm:gap-6">
+                <div
+                  className={`mb-3 flex size-11 shrink-0 items-center justify-center rounded-xl sm:mb-0 ${lastFeature.bg} ${lastFeature.accent}`}
+                >
+                  <LastIcon className="size-5" />
+                </div>
+                <div>
+                  <CardTitle className="mb-1.5 text-base">
+                    {lastFeature.title}
+                  </CardTitle>
+                  <CardDescription className="text-sm leading-relaxed">
+                    {lastFeature.description}
+                  </CardDescription>
+                </div>
+              </CardHeader>
+            </Card>
+          </motion.div>
         </motion.div>
       </div>
     </section>
