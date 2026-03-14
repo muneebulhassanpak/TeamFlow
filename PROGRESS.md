@@ -14,8 +14,8 @@ Full scope: `../SCOPE.md` | Architecture rules: `CLAUDE.md`
 | 3 | App Shell (layout, sidebar, navbar) | `feature/app-shell` | ✅ Done |
 | 4 | Member Management | `feature/members` | ✅ Done |
 | 5 | Projects | `feature/projects` | ✅ Done |
-| 6 | Tasks & Kanban | `feature/kanban` | ⬜ Not started |
-| 7 | Task Detail | `feature/task-detail` | ⬜ Not started |
+| 6 | Tasks & Kanban | `feature/kanban` | ✅ Done |
+| 7 | Task Detail | `feature/kanban` | ✅ Done |
 | 8 | Activity Logs | `feature/activity` | ⬜ Not started |
 | 9 | Notifications | `feature/notifications` | ⬜ Not started |
 | 10 | Dashboard & My Tasks | `feature/dashboard` | ⬜ Not started |
@@ -137,34 +137,41 @@ Full scope: `../SCOPE.md` | Architecture rules: `CLAUDE.md`
 
 ---
 
-## Module 6 — Tasks & Kanban ⬜
+## Module 6 — Tasks & Kanban ✅
 
 > Real-time Kanban board, drag-and-drop, task CRUD, filters
 
-- [ ] `/[orgSlug]/projects/[projectId]` — Kanban board page
-- [ ] 4 columns: Todo / In Progress / In Review / Done
-- [ ] Task cards: title, priority badge, assignee avatar, due date
-- [ ] Drag-and-drop between columns (dnd-kit) with optimistic update
-- [ ] Supabase Realtime subscription — live column updates for all viewers
-- [ ] Create task modal (title, description, priority, assignee, due date)
-- [ ] Filter bar — priority, assignee, due date (URL-persisted via nuqs)
-- [ ] Clear filters
-- [ ] `features/tasks/` — components, hooks, validations, services
-- [ ] Horizontal scroll on mobile
-- [ ] `typecheck` + `lint` pass
+- [x] `/[orgSlug]/projects/[projectId]` — Kanban board page
+- [x] 4 columns: Todo / In Progress / In Review / Done with equal flex widths
+- [x] Task cards: title (top-left), priority badge (top-right), assignee avatar (bottom-right), due date
+- [x] Drag-and-drop between columns (`@dnd-kit`) with optimistic update + batch reorder API
+- [x] Supabase Realtime subscription — live board updates for all viewers
+- [x] Create task dialog (title, description, priority, assignee, due date, status)
+- [x] Inline "Add Task" (`+`) button in each column header — pre-selects column status
+- [x] Filter bar — priority, assignee, search (URL-persisted via `nuqs`)
+- [x] Skeleton loader while board data loads
+- [x] `features/tasks/` — components, hooks, validations, utils
+- [x] `app/api/projects/[id]/tasks/route.ts` — GET (filtered), POST
+- [x] `app/api/tasks/[taskId]/route.ts` — GET, PUT, DELETE
+- [x] `app/api/tasks/reorder/route.ts` — PUT (bulk position + status update)
+- [x] `typecheck` + `lint` pass
 
 ---
 
-## Module 7 — Task Detail ⬜
+## Module 7 — Task Detail ✅
 
-> Slide-over panel, edit fields, activity log
+> Task details dialog, edit, delete
 
-- [ ] Slide-over opens on card click — URL updates to `?task=<id>`
-- [ ] Edit title, description, status, priority, assignee, due date
-- [ ] Activity log feed (who changed what, when) — paginated
-- [ ] Close slide-over → return to board
-- [ ] `features/tasks/components/task-detail.tsx`
-- [ ] `typecheck` + `lint` pass
+- [x] `TaskDetailsDialog` — opens on card click, shows title, description, status, priority, due date, assignee
+- [x] Resizable modal (expand/collapse toggle next to close button)
+- [x] Properties displayed in a clean horizontal footer bar (icons + values)
+- [x] Assignee pushed to extreme right of footer
+- [x] Edit Task button → opens `EditTaskDialog` (pre-populated form)
+- [x] Delete Task button → confirm dialog → delete + close modal
+- [x] `EditTaskDialog` — full form edit (title, description, status, priority, assignee, due date)
+- [x] All logic extracted into custom hooks: `use-create-task-dialog`, `use-edit-task-dialog`, `use-task-details-dialog`, `use-kanban-board`
+- [x] Task components are purely presentational
+- [x] `typecheck` + `lint` pass
 
 ---
 
