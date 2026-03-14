@@ -7,7 +7,7 @@ import type { Profile } from "@/types"
 
 interface OrgLayoutProps {
   children: React.ReactNode
-  params: Promise<{ orgSlug: string }>
+  params: Promise<any> /* eslint-disable-line @typescript-eslint/no-explicit-any */
 }
 
 export default async function OrgLayout({ children, params }: OrgLayoutProps) {

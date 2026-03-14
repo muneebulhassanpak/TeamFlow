@@ -24,7 +24,10 @@ export const projectKeys = {
 }
 
 export const taskKeys = {
-  all: (projectId: string) => ['tasks', projectId] as const,
+  all: (projectId: string, params?: Record<string, unknown>) =>
+    params !== undefined
+      ? (["tasks", projectId, params] as const)
+      : (["tasks", projectId] as const),
   byId: (taskId: string) => ['tasks', 'detail', taskId] as const,
   myTasks: (userId: string) => ['tasks', 'my', userId] as const,
   activity: (taskId: string) => ['tasks', taskId, 'activity'] as const,

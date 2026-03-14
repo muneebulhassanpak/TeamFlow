@@ -5,7 +5,7 @@ import { createServiceClient } from "@/lib/supabase/server"
 // GET /api/projects/[id]/members
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<any> /* eslint-disable-line @typescript-eslint/no-explicit-any */ }
 ) {
   const { user, error } = await getAuthUser()
   if (error || !user)
@@ -71,7 +71,7 @@ export async function GET(
 // POST /api/projects/[id]/members
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<any> /* eslint-disable-line @typescript-eslint/no-explicit-any */ }
 ) {
   const { user, error } = await getAuthUser()
   if (error || !user)

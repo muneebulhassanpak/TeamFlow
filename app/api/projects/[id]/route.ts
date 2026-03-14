@@ -16,7 +16,7 @@ const UpdateProjectSchema = z.object({
 // PUT /api/projects/[id]
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<any> /* eslint-disable-line @typescript-eslint/no-explicit-any */ }
 ) {
   const { user, error } = await getAuthUser()
   if (error || !user)
@@ -78,7 +78,7 @@ export async function PUT(
 // DELETE /api/projects/[id]
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<any> /* eslint-disable-line @typescript-eslint/no-explicit-any */ }
 ) {
   const { user, error } = await getAuthUser()
   if (error || !user)

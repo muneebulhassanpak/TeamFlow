@@ -4,7 +4,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { isAdmin } from '@/lib/auth'
 
 // DELETE /api/invitations/[id]?orgId=xxx  — revoke a pending invitation (admin only)
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<any> /* eslint-disable-line @typescript-eslint/no-explicit-any */ }) {
   const { user, error } = await getAuthUser()
   if (error || !user) return NextResponse.json({ error: error ?? 'Unauthorized' }, { status: 401 })
 

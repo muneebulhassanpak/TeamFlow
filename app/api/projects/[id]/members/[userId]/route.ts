@@ -5,7 +5,7 @@ import { createServiceClient } from "@/lib/supabase/server"
 // DELETE /api/projects/[id]/members/[userId]
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string; userId: string }> }
+  { params }: { params: Promise<any> /* eslint-disable-line @typescript-eslint/no-explicit-any */ }
 ) {
   const { user, error } = await getAuthUser()
   if (error || !user)

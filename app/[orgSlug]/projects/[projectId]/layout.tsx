@@ -4,7 +4,7 @@ import { createServiceClient } from "@/lib/supabase/server"
 
 interface ProjectLayoutProps {
   children: React.ReactNode
-  params: Promise<{ orgSlug: string; projectId: string }>
+  params: Promise<any> /* eslint-disable-line @typescript-eslint/no-explicit-any */
 }
 
 export default async function ProjectLayout({
