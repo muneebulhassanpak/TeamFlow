@@ -25,7 +25,7 @@ export function ProjectsView() {
         </div>
         <CreateProjectDialog>
           <Button>
-            <Plus className="mr-2 size-4" />
+            <Plus className="size-4" />
             New Project
           </Button>
         </CreateProjectDialog>

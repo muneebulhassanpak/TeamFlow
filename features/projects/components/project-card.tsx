@@ -5,6 +5,7 @@ import {
   CheckSquare,
   Archive,
   Trash2,
+  Settings,
 } from "lucide-react"
 import Link from "next/link"
 import { useOrg } from "@/features/app-shell/context/org-context"
@@ -105,11 +106,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem asChild>
               <Link href={`/${org.slug}/projects/${project.id}/settings`}>
+                <Settings className="size-4" />
                 Settings
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleArchive}>
-              <Archive className="mr-2 size-4" />
+              <Archive className="size-4" />
               {project.archived ? "Unarchive" : "Archive"}
             </DropdownMenuItem>
             <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
@@ -118,7 +120,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                   className="text-destructive"
                   onSelect={(e) => e.preventDefault()}
                 >
-                  <Trash2 className="mr-2 size-4" />
+                  <Trash2 className="size-4" />
                   Delete
                 </DropdownMenuItem>
               </DialogTrigger>
