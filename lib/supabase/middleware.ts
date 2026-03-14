@@ -51,6 +51,9 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
+  // API routes handle their own auth — never redirect them to HTML pages
+  if (pathname.startsWith('/api/')) return supabaseResponse
+
   // Public routes — always accessible
   const isPublicRoute =
     pathname === '/' ||
