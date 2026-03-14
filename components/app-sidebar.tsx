@@ -61,7 +61,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">{org.name}</span>
-                  <span className="text-muted-foreground text-xs">{org.slug}.teamflow.app</span>
+                  {/* <span className="text-muted-foreground text-xs">{org.slug}.teamflow.app</span> */}
                 </div>
               </Link>
             </SidebarMenuButton>
