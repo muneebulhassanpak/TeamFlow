@@ -8,6 +8,7 @@ import { Github, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { PasswordInput } from '@/components/shared/password-input'
 import {
   Form,
   FormControl,
@@ -33,7 +34,7 @@ export function LoginForm() {
     login.mutate(values)
   }
 
-  const isPending = login.isPending || oauth.isPending
+  const isPending = login.isPending || login.isSuccess || oauth.isPending
 
   return (
     <div className="flex flex-col gap-6">
@@ -123,8 +124,7 @@ export function LoginForm() {
                   <FormLabel>Password</FormLabel>
                 </div>
                 <FormControl>
-                  <Input
-                    type="password"
+                  <PasswordInput
                     placeholder="••••••••"
                     autoComplete="current-password"
                     disabled={isPending}
@@ -141,7 +141,7 @@ export function LoginForm() {
           )}
 
           <Button type="submit" className="w-full" disabled={isPending}>
-            {login.isPending && <Loader2 className="size-4 animate-spin" />}
+            {(login.isPending || login.isSuccess) && <Loader2 className="size-4 animate-spin" />}
             Sign in
           </Button>
         </form>
