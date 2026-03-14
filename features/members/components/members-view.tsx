@@ -88,17 +88,19 @@ export function MembersView({ currentUserId }: MembersViewProps) {
             {total} {total === 1 ? "member" : "members"} in {org.name}
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="relative w-64">
-            <Search className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search members…"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              className="pl-8 text-sm"
-            />
-          </div>
-          {isAdmin && <InviteDialog />}
+        {isAdmin && <InviteDialog />}
+      </div>
+
+      {/* Search */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative w-full sm:w-60">
+          <Search className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search members…"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className="pl-8 text-sm"
+          />
         </div>
       </div>
 
