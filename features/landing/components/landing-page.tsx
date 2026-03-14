@@ -597,9 +597,18 @@ function PricingSection() {
           className="grid gap-6 md:grid-cols-3 md:items-stretch"
         >
           {PLANS.map((plan) => (
-            <motion.div key={plan.name} variants={fadeUp} className="flex">
+            <motion.div
+              key={plan.name}
+              variants={fadeUp}
+              className={`relative flex ${plan.highlighted ? "pt-4" : ""}`}
+            >
+              {plan.highlighted && (
+                <div className="absolute top-0 left-1/2 z-10 -translate-x-1/2">
+                  <Badge className="shadow-sm">Most popular</Badge>
+                </div>
+              )}
               <Card
-                className={`relative flex w-full flex-col overflow-hidden transition-shadow duration-300 ${
+                className={`relative flex w-full flex-col transition-shadow duration-300 ${
                   plan.highlighted
                     ? "border-primary shadow-xl shadow-primary/10"
                     : "border-border/60 hover:shadow-md"
@@ -610,9 +619,6 @@ function PricingSection() {
                     {/* Gradient top bar */}
                     <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-primary/40 via-primary to-primary/40" />
                     <div className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/[0.03] to-transparent" />
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                      <Badge className="shadow-sm">Most popular</Badge>
-                    </div>
                   </>
                 )}
                 <CardHeader className="pb-4 pt-8">
