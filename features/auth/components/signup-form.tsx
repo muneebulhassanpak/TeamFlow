@@ -38,11 +38,11 @@ export function SignupForm() {
   return (
     <div className="flex flex-col gap-6">
       {/* OAuth buttons */}
-      <div className="flex flex-col gap-3">
+      <div className="flex gap-3">
         <Button
           type="button"
           variant="outline"
-          className="w-full gap-2"
+          className="flex-1 gap-2"
           disabled={isPending}
           onClick={() => oauth.mutate('google')}
         >
@@ -68,12 +68,12 @@ export function SignupForm() {
               />
             </svg>
           )}
-          Continue with Google
+          Google
         </Button>
         <Button
           type="button"
           variant="outline"
-          className="w-full gap-2"
+          className="flex-1 gap-2"
           disabled={isPending}
           onClick={() => oauth.mutate('github')}
         >
@@ -82,7 +82,7 @@ export function SignupForm() {
           ) : (
             <Github className="size-4" />
           )}
-          Continue with GitHub
+          GitHub
         </Button>
       </div>
 
