@@ -1,16 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
-import { useOrg } from "@/features/app-shell/context/org-context"
-import { useCreateProject } from "@/features/projects/hooks/use-projects"
-import {
-  CreateProjectSchema,
-  type CreateProjectInput,
-} from "@/features/projects/validations/projects"
-import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -20,147 +11,124 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import { Stepper } from "@/components/shared/stepper"
+import { useCreateProjectDialog } from "@/features/projects/hooks/use-create-project-dialog"
+import { CreateProjectStep1 } from "./create-project-step1"
+import { CreateProjectStep2 } from "./create-project-step2"
 
 interface CreateProjectDialogProps {
   children: React.ReactNode
 }
 
-const DEFAULT_COLORS = [
-  "#3B82F6", // blue
-  "#EF4444", // red
-  "#10B981", // green
-  "#F59E0B", // yellow
-  "#8B5CF6", // purple
-  "#F97316", // orange
-  "#06B6D4", // cyan
-  "#EC4899", // pink
-]
+const STEPS = [{ label: "Project Details" }, { label: "Add Members" }]
 
 export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
-  const { org } = useOrg()
-  const [open, setOpen] = React.useState(false)
-  const createProject = useCreateProject(org.id)
-
-  const form = useForm<CreateProjectInput>({
-    resolver: zodResolver(CreateProjectSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      color: DEFAULT_COLORS[0],
-    },
-  })
-
-  const onSubmit = async (data: CreateProjectInput) => {
-    try {
-      await createProject.mutateAsync(data)
-      setOpen(false)
-      form.reset()
-    } catch (_error) {
-      // Error is handled by the mutation
-    }
-  }
+  const {
+    open,
+    step,
+    form,
+    selections,
+    search,
+    setSearch,
+    isSubmitting,
+    filteredMembers,
+    membersLoading,
+    selectedCount,
+    handleClose,
+    handleNext,
+    handleCreate,
+    toggleMember,
+    setRole,
+    goBack,
+  } = useCreateProjectDialog()
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Create Project</DialogTitle>
+          <div className="flex justify-center pt-1 pb-0.5">
+            <Stepper steps={STEPS} currentStep={step} />
+          </div>
           <DialogDescription>
-            Create a new project to organize your team&apos;s work.
+            {step === 1
+              ? "Set up your project details."
+              : "Add org members to this project. You can always do this later."}
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter project name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {step === 1 && <CreateProjectStep1 form={form} onNext={handleNext} />}
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Describe your project (optional)"
-                      className="resize-none"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {step === 2 && (
+          <CreateProjectStep2
+            members={filteredMembers}
+            isLoading={membersLoading}
+            search={search}
+            onSearchChange={setSearch}
+            selections={selections}
+            selectedCount={selectedCount}
+            onToggle={toggleMember}
+            onRoleChange={setRole}
+          />
+        )}
 
-            <FormField
-              control={form.control}
-              name="color"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Color</FormLabel>
-                  <FormControl>
-                    <div className="flex flex-wrap gap-2">
-                      {DEFAULT_COLORS.map((color) => (
-                        <button
-                          key={color}
-                          type="button"
-                          className={`size-8 rounded-full border-2 ${
-                            field.value === color
-                              ? "border-foreground"
-                              : "border-muted hover:border-muted-foreground"
-                          }`}
-                          style={{ backgroundColor: color }}
-                          onClick={() => field.onChange(color)}
-                        />
-                      ))}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {/* ── Footer ── */}
+        {step === 1 ? (
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleClose(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" form="step1-form">
+              Next
+              <ChevronRight className="ml-1 size-4" />
+            </Button>
+          </DialogFooter>
+        ) : (
+          <DialogFooter className="sm:justify-between">
+            {/* Back — pinned to the left */}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={goBack}
+              disabled={isSubmitting}
+            >
+              <ChevronLeft className="mr-1 size-4" />
+              Back
+            </Button>
 
-            <DialogFooter>
+            {/* Skip + Create — grouped on the right */}
+            <div className="flex gap-2">
               <Button
                 type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-                disabled={createProject.isPending}
+                variant="ghost"
+                onClick={handleCreate}
+                disabled={isSubmitting}
               >
-                Cancel
+                {isSubmitting && selectedCount === 0 && (
+                  <Loader2 className="size-4 animate-spin" />
+                )}
+                Skip
               </Button>
-              <Button type="submit" disabled={createProject.isPending}>
-                {createProject.isPending && (
-                  <Loader2 className="mr-2 size-4 animate-spin" />
+              <Button
+                type="button"
+                onClick={handleCreate}
+                disabled={isSubmitting || selectedCount === 0}
+              >
+                {isSubmitting && selectedCount > 0 && (
+                  <Loader2 className="size-4 animate-spin" />
                 )}
                 Create Project
               </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+            </div>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   )
