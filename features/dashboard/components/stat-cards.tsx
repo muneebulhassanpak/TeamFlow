@@ -41,17 +41,18 @@ const CARDS = [
 export function StatCards({ stats }: StatCardsProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {CARDS.map(({ key, label, description, icon: Icon, iconClass }) => (
+      {CARDS.map(({ key, label, icon: Icon, iconClass }) => (
         <Card key={key} className="p-4">
-          <div className="flex items-center justify-between">
-            <div className={cn('w-fit rounded-lg p-2', iconClass)}>
+          <div className="flex items-center gap-3">
+            {/* Icon */}
+            <div className={cn('w-fit shrink-0 rounded-lg p-2.5', iconClass)}>
               <Icon className="size-4" />
             </div>
-            <p className="text-2xl font-bold tracking-tight">{stats[key]}</p>
-          </div>
-          <div className="mt-3">
-            <p className="text-sm font-medium">{label}</p>
-            <p className="text-muted-foreground text-xs">{description}</p>
+            {/* Text */}
+            <div className="min-w-0">
+              <p className="text-muted-foreground truncate text-xs font-medium">{label}</p>
+              <p className="text-2xl font-bold tracking-tight leading-tight">{stats[key]}</p>
+            </div>
           </div>
         </Card>
       ))}
