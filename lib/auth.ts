@@ -43,7 +43,7 @@ export async function requireOrgMember(
 ): Promise<
   { member: { role: OrgRole; org_id: string }; error: null } | { member: null; error: string }
 > {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   const { data, error } = await supabase
     .from('org_members')
@@ -70,7 +70,7 @@ export function isAdmin(role: OrgRole): boolean {
 
 /** Returns true if the user is the platform owner (Muneeb) */
 export async function isPlatformOwner(userId: string): Promise<boolean> {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const { data } = await supabase
     .from('profiles')
     .select('*')
@@ -82,7 +82,7 @@ export async function isPlatformOwner(userId: string): Promise<boolean> {
 // ─── Get org by slug ─────────────────────────────────────────────────────────
 
 export async function getOrgBySlug(slug: string) {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const { data, error } = await supabase
     .from('organizations')
     .select('*')

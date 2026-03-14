@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { fullName, orgName, orgSlug } = parsed.data
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
 
   // Slug uniqueness check
   const { data: existing } = await supabase
