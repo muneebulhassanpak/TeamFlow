@@ -37,7 +37,7 @@ export function ProjectBoardView({ projectId, projectName }: ProjectBoardViewPro
 
   if (error) {
     return (
-      <Empty>
+      <Empty className="border rounded-xl">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <FolderOpen />

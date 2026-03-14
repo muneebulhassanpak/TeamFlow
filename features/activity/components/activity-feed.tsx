@@ -19,7 +19,7 @@ interface ActivityFeedProps {
 export function ActivityFeed({ logs }: ActivityFeedProps) {
   if (logs.length === 0) {
     return (
-      <Empty>
+      <Empty className="border rounded-xl">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <Activity />
