@@ -12,6 +12,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useQueryState, parseAsString } from "nuqs"
 
 interface ProjectBoardViewProps {
@@ -67,8 +68,28 @@ export function ProjectBoardView({ projectId, projectName }: ProjectBoardViewPro
       {/* Board Area */}
       <div className="flex-1 overflow-hidden">
         {isLoading ? (
-          <div className="flex h-full items-center justify-center">
-            <div className="text-sm text-muted-foreground animate-pulse">Loading board...</div>
+          <div className="flex h-[calc(100vh-14rem)] w-full gap-4 overflow-hidden pb-4">
+            {[1, 2, 3, 4].map((colId) => (
+              <div
+                key={colId}
+                className="flex h-full min-w-[280px] flex-1 shrink-0 flex-col rounded-xl border bg-muted/40 pb-2"
+              >
+                <div className="flex items-center justify-between p-4">
+                  <Skeleton className="h-6 w-28 bg-muted-foreground/20" />
+                  <div className="flex gap-2">
+                    <Skeleton className="h-6 w-6 rounded-full bg-muted-foreground/20" />
+                    <Skeleton className="h-6 w-6 rounded-full bg-muted-foreground/20" />
+                  </div>
+                </div>
+                <div className="flex flex-1 flex-col gap-3 px-4">
+                  <Skeleton className="h-[120px] w-full rounded-lg bg-muted-foreground/10" />
+                  <Skeleton className="h-[120px] w-full rounded-lg bg-muted-foreground/10" />
+                  {colId % 2 === 0 && (
+                    <Skeleton className="h-[120px] w-full rounded-lg bg-muted-foreground/10" />
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <KanbanBoard 
