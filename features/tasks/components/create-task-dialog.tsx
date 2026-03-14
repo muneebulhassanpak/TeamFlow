@@ -50,7 +50,7 @@ interface CreateTaskDialogProps {
 export function CreateTaskDialog(props: CreateTaskDialogProps) {
   const { projectId, children } = props
   const [open, setOpen] = useState(false)
-  
+
   const { mutateAsync: createTask } = useCreateTask(projectId)
   const { data: members, isLoading: isLoadingMembers } = useProjectMembers(projectId)
 
@@ -94,7 +94,7 @@ export function CreateTaskDialog(props: CreateTaskDialogProps) {
         {children ?? (
           <Button>
             <Plus className="size-4" />
-            <span className="ml-2">New Task</span>
+            New Task
           </Button>
         )}
       </DialogTrigger>
@@ -129,10 +129,10 @@ export function CreateTaskDialog(props: CreateTaskDialogProps) {
                 <FormItem>
                   <FormLabel>Description (Optional)</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      placeholder="Add any extra details here..." 
+                    <Textarea
+                      placeholder="Add any extra details here..."
                       className="resize-none"
-                      {...field} 
+                      {...field}
                       value={field.value ?? ""}
                     />
                   </FormControl>
@@ -150,7 +150,7 @@ export function CreateTaskDialog(props: CreateTaskDialogProps) {
                     <FormLabel>Status</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                       </FormControl>
@@ -174,7 +174,7 @@ export function CreateTaskDialog(props: CreateTaskDialogProps) {
                     <FormLabel>Priority</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select priority" />
                         </SelectTrigger>
                       </FormControl>
@@ -198,13 +198,13 @@ export function CreateTaskDialog(props: CreateTaskDialogProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Assignee</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
+                    <Select
+                      onValueChange={field.onChange}
                       defaultValue={field.value ?? undefined}
                       disabled={isLoadingMembers}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Unassigned" />
                         </SelectTrigger>
                       </FormControl>

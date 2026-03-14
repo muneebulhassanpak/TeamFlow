@@ -18,6 +18,7 @@ import {
 } from "@dnd-kit/core"
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import { KanbanCard } from "./kanban-card"
+import { TaskDetailsDialog } from "./task-details-dialog"
 
 type ColumnType = "todo" | "in_progress" | "in_review" | "done"
 
@@ -41,6 +42,7 @@ export function KanbanBoard({
 }: KanbanBoardProps) {
   const [tasks, setTasks] = useState<TaskRow[]>(initialTasks)
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [selectedTask, setSelectedTask] = useState<TaskRow | null>(null)
 
   // Sync state when props change
   useEffect(() => {
@@ -171,6 +173,7 @@ export function KanbanBoard({
             id={col.id}
             title={col.title}
             tasks={tasks.filter((t) => t.status === col.id)}
+            onTaskClick={setSelectedTask}
           />
         ))}
       </div>
@@ -184,6 +187,12 @@ export function KanbanBoard({
       >
         {activeTask ? <KanbanCard task={activeTask} /> : null}
       </DragOverlay>
+
+      <TaskDetailsDialog 
+        task={selectedTask} 
+        open={!!selectedTask} 
+        onOpenChange={(open) => !open && setSelectedTask(null)} 
+      />
     </DndContext>
   )
 }

@@ -9,6 +9,7 @@ import { CalendarIcon, GripVertical } from "lucide-react"
 
 interface KanbanCardProps {
   task: TaskRow
+  onClick?: () => void
 }
 
 const priorityColors = {
@@ -18,7 +19,7 @@ const priorityColors = {
   urgent: "border-red-500 bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
 }
 
-export function KanbanCard({ task }: KanbanCardProps) {
+export function KanbanCard({ task, onClick }: KanbanCardProps) {
   const {
     attributes,
     listeners,
@@ -62,7 +63,8 @@ export function KanbanCard({ task }: KanbanCardProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative flex flex-col gap-3 rounded-md border bg-card p-3 shadow-sm hover:shadow-md transition-shadow ${
+      onClick={onClick}
+      className={`group relative flex flex-col gap-3 rounded-md border bg-card p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer ${
         isDragging ? "opacity-30" : "opacity-100"
       }`}
     >

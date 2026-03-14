@@ -15,9 +15,10 @@ interface KanbanColumnProps {
   id: "todo" | "in_progress" | "in_review" | "done"
   title: string
   tasks: TaskRow[]
+  onTaskClick?: (task: TaskRow) => void
 }
 
-export function KanbanColumn({ projectId, id, title, tasks }: KanbanColumnProps) {
+export function KanbanColumn({ projectId, id, title, tasks, onTaskClick }: KanbanColumnProps) {
   const taskIds = useMemo(() => tasks.map((t) => t.id), [tasks])
   
   const { setNodeRef, isOver } = useDroppable({
@@ -54,7 +55,7 @@ export function KanbanColumn({ projectId, id, title, tasks }: KanbanColumnProps)
         >
           <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
             {tasks.map((task) => (
-              <KanbanCard key={task.id} task={task} />
+              <KanbanCard key={task.id} task={task} onClick={() => onTaskClick?.(task)} />
             ))}
           </SortableContext>
         </div>
