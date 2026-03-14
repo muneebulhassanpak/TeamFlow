@@ -11,9 +11,12 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { CalendarIcon, Clock, Flag, CheckCircle2, User, LayoutList, Maximize, Minimize } from "lucide-react"
+import { CalendarIcon, Clock, Flag, CheckCircle2, User, LayoutList, Maximize, Minimize, Edit2, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { priorityConfig, statusLabels } from "../utils"
+import { useDeleteTask } from "../hooks/use-tasks"
+import { toast } from "sonner"
+import { EditTaskDialog } from "./edit-task-dialog"
 
 interface TaskDetailsDialogProps {
   task: TaskRow | null
@@ -23,34 +26,71 @@ interface TaskDetailsDialogProps {
 
 export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialogProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const { mutateAsync: deleteTask } = useDeleteTask(task?.project_id || "")
 
   if (!task) return null
 
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete this task? This action cannot be undone.")) {
+      return
+    }
+
+    try {
+      await deleteTask(task.id)
+      toast.success("Task deleted successfully")
+      onOpenChange(false)
+    } catch (_error) {
+      toast.error("Failed to delete task")
+    }
+  }
+
   const initials = task.assignee?.full_name
     ? task.assignee.full_name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
     : task.assignee?.email.charAt(0).toUpperCase() ?? "?"
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
+      <DialogContent
         className={cn(
           "p-0 overflow-hidden gap-0 border-muted transition-all duration-300",
           isExpanded ? "sm:max-w-[1100px]" : "sm:max-w-[600px]"
         )}
       >
-        {/* Expand/Collapse Button (Absolute positioned near the X close button) */}
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="absolute right-11 top-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 z-50 bg-transparent flex items-center justify-center p-0.5"
-        >
-          {isExpanded ? <Minimize /> : <Maximize />}
-          <span className="sr-only">{isExpanded ? 'Collapse' : 'Expand'}</span>
-        </button>
+        {/* Header Actions (Absolute positioned near the X close button) */}
+        <div className="absolute right-10 top-3 flex items-center gap-1 z-50">
+          <button
+            onClick={() => setIsEditDialogOpen(true)}
+            className="rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-transparent flex items-center justify-center p-1.5 hover:bg-muted text-muted-foreground"
+            title="Edit Task"
+          >
+            <Edit2 className="size-3.5" />
+            <span className="sr-only">Edit Task</span>
+          </button>
+
+          <button
+            onClick={handleDelete}
+            className="rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-transparent flex items-center justify-center p-1.5 hover:bg-destructive/10 hover:text-destructive text-muted-foreground"
+            title="Delete Task"
+          >
+            <Trash2 className="size-3.5" />
+            <span className="sr-only">Delete Task</span>
+          </button>
+
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-transparent flex items-center justify-center p-1.5 hover:bg-muted text-muted-foreground"
+            title={isExpanded ? 'Collapse' : 'Expand'}
+          >
+            {isExpanded ? <Minimize className="size-3.5" /> : <Maximize className="size-3.5" />}
+            <span className="sr-only">{isExpanded ? 'Collapse' : 'Expand'}</span>
+          </button>
+        </div>
 
         {/* Hidden Visually, Needed for screen readers */}
         <div className="sr-only">
@@ -89,7 +129,7 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
 
           {/* Properties Footer */}
           <div className="bg-muted/30 border-t px-6 py-4 flex flex-wrap items-center gap-6 shrink-0">
-              
+
             {/* Status */}
             <div className="flex items-center gap-2.5">
               <CheckCircle2 className="w-4 h-4 text-muted-foreground" />
@@ -133,6 +173,12 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
           </div>
         </div>
       </DialogContent>
+
+      <EditTaskDialog
+        task={task}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+      />
     </Dialog>
   )
 }
