@@ -88,7 +88,7 @@ export function MyTasksView({ userId }: MyTasksViewProps) {
       {isLoading ? (
         <MyTasksSkeleton />
       ) : groups.length === 0 ? (
-        <Empty>
+        <Empty className="border rounded-xl">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <ListTodo />

@@ -8,7 +8,7 @@ export default function SettingsPage() {
         <h1 className="text-2xl font-semibold">Settings</h1>
         <p className="text-muted-foreground text-sm">Manage your workspace settings.</p>
       </div>
-      <Empty>
+      <Empty className="border rounded-xl">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <Settings />

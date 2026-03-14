@@ -72,7 +72,7 @@ export function NotificationBell({ userId }: NotificationBellProps) {
         <DropdownMenuSeparator />
 
         {notifications.length === 0 ? (
-          <Empty className="border-0 py-4 md:py-4">
+          <Empty className="border rounded-xl py-4 md:py-4">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <Bell />

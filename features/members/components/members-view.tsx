@@ -127,7 +127,7 @@ export function MembersView({ currentUserId }: MembersViewProps) {
           ))}
         </div>
       ) : error ? (
-        <Empty>
+        <Empty className="border rounded-xl">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Users />
@@ -138,7 +138,7 @@ export function MembersView({ currentUserId }: MembersViewProps) {
         </Empty>
       ) : members.length === 0 ? (
         filters.q ? (
-          <Empty>
+          <Empty className="border rounded-xl">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <SearchX />
@@ -151,7 +151,7 @@ export function MembersView({ currentUserId }: MembersViewProps) {
             </EmptyHeader>
           </Empty>
         ) : (
-          <Empty>
+          <Empty className="border rounded-xl">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <Users />

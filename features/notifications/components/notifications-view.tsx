@@ -54,7 +54,7 @@ export function NotificationsView({ userId }: NotificationsViewProps) {
       {isLoading ? (
         <NotificationsSkeleton rows={8} />
       ) : notifications.length === 0 ? (
-        <Empty>
+        <Empty className="border rounded-xl">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Bell />
