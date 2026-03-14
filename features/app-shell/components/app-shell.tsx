@@ -16,14 +16,13 @@ interface AppShellProps {
 export function AppShell({ children, userId, userEmail, userFullName, userAvatarUrl }: AppShellProps) {
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar
+        userEmail={userEmail}
+        userFullName={userFullName}
+        userAvatarUrl={userAvatarUrl}
+      />
       <SidebarInset>
-        <Navbar
-          userId={userId}
-          userEmail={userEmail}
-          userFullName={userFullName}
-          userAvatarUrl={userAvatarUrl}
-        />
+        <Navbar userId={userId} />
         <div className="flex flex-1 flex-col gap-4 px-6 py-3">{children}</div>
       </SidebarInset>
     </SidebarProvider>
