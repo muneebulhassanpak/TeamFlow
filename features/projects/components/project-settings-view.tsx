@@ -61,6 +61,7 @@ import type {
 import type { OrgRole } from "@/types"
 import { Loader2, MoreHorizontal, Plus, Trash2, UserMinus } from "lucide-react"
 import { toast } from "sonner"
+import { ProjectActivitySection } from "@/features/activity/components/project-activity-section"
 
 interface ProjectSettingsViewProps {
   orgId: string
@@ -350,6 +351,9 @@ export function ProjectSettingsView({
           </div>
         </CardContent>
       </Card>
+
+      {/* Recent Activity */}
+      <ProjectActivitySection projectId={project.id} />
 
       {/* Danger Zone */}
       {canDeleteProject && (

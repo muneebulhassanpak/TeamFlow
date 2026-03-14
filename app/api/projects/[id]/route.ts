@@ -72,6 +72,20 @@ export async function PUT(
   if (updateError)
     return NextResponse.json({ error: updateError.message }, { status: 500 })
 
+  const action = validation.data.archived !== undefined
+    ? (validation.data.archived ? 'project.archived' : 'project.updated')
+    : 'project.updated'
+
+  await supabase.from('activity_logs').insert({
+    org_id: project.org_id,
+    project_id: id,
+    actor_id: user.id,
+    action,
+    entity_type: 'project',
+    entity_id: id,
+    meta: { name: data.name },
+  })
+
   return NextResponse.json({ data })
 }
 
@@ -115,6 +129,12 @@ export async function DELETE(
       { status: 403 }
     )
 
+  const { data: projectName } = await supabase
+    .from('projects')
+    .select('name')
+    .eq('id', id)
+    .single()
+
   const { error: deleteError } = await supabase
     .from("projects")
     .delete()
@@ -122,6 +142,15 @@ export async function DELETE(
 
   if (deleteError)
     return NextResponse.json({ error: deleteError.message }, { status: 500 })
+
+  await supabase.from('activity_logs').insert({
+    org_id: project.org_id,
+    actor_id: user.id,
+    action: 'project.deleted',
+    entity_type: 'project',
+    entity_id: id,
+    meta: { name: projectName?.name ?? '' },
+  })
 
   return NextResponse.json({ success: true })
 }

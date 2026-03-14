@@ -107,5 +107,14 @@ export async function DELETE(req: NextRequest) {
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
 
+  await supabase.from('activity_logs').insert({
+    org_id: orgId,
+    actor_id: user.id,
+    action: 'member.removed',
+    entity_type: 'member',
+    entity_id: targetUserId,
+    meta: null,
+  })
+
   return NextResponse.json({ data: null })
 }
