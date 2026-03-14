@@ -61,6 +61,11 @@ export function Navbar({ userId }: NavbarProps) {
         </BreadcrumbList>
       </Breadcrumb>
 
+      <Separator orientation="vertical" className="mx-1 hidden data-[orientation=vertical]:h-4 sm:block" />
+      <span className="text-foreground/70 hidden text-xs font-medium sm:block">
+        {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+      </span>
+
       <div className="flex-1" />
 
       <NotificationBell userId={userId} />

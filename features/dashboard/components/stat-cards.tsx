@@ -42,13 +42,15 @@ export function StatCards({ stats }: StatCardsProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {CARDS.map(({ key, label, description, icon: Icon, iconClass }) => (
-        <Card key={key} className="p-5">
-          <div className={cn('inline-flex rounded-xl p-2.5', iconClass)}>
-            <Icon className="size-5" />
+        <Card key={key} className="p-4">
+          <div className="flex items-center justify-between">
+            <div className={cn('w-fit rounded-lg p-2', iconClass)}>
+              <Icon className="size-4" />
+            </div>
+            <p className="text-2xl font-bold tracking-tight">{stats[key]}</p>
           </div>
-          <div className="mt-4">
-            <p className="text-3xl font-bold tracking-tight">{stats[key]}</p>
-            <p className="mt-1 text-sm font-medium">{label}</p>
+          <div className="mt-3">
+            <p className="text-sm font-medium">{label}</p>
             <p className="text-muted-foreground text-xs">{description}</p>
           </div>
         </Card>

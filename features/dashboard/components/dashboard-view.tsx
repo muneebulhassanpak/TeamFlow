@@ -1,7 +1,7 @@
 "use client"
 
 import Link from 'next/link'
-import { ArrowRight, CalendarDays } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useOrg } from '@/features/app-shell/context/org-context'
 import { useDashboardStats, useDashboardActivity } from '@/features/dashboard/hooks/use-dashboard'
@@ -18,13 +18,6 @@ function getGreeting() {
   return 'Good evening'
 }
 
-function getFormattedDate() {
-  return new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  })
-}
 
 export function DashboardView() {
   const { org } = useOrg()
@@ -34,18 +27,12 @@ export function DashboardView() {
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">{getGreeting()}</h1>
-          <p className="text-muted-foreground mt-0.5 text-sm">
-            Here&apos;s what&apos;s happening in{' '}
-            <span className="text-foreground font-medium">{org.name}</span> today.
-          </p>
-        </div>
-        <div className="text-muted-foreground hidden items-center gap-1.5 text-sm sm:flex">
-          <CalendarDays className="size-4" />
-          {getFormattedDate()}
-        </div>
+      <div>
+        <h1 className="text-2xl font-semibold">{getGreeting()}</h1>
+        <p className="text-muted-foreground mt-0.5 text-sm">
+          Here&apos;s what&apos;s happening in{' '}
+          <span className="text-foreground font-medium">{org.name}</span> today.
+        </p>
       </div>
 
       {/* Stat cards */}
