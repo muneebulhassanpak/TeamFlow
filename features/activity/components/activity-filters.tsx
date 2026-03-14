@@ -2,7 +2,6 @@
 
 import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -10,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { DatePicker } from '@/components/shared/date-picker'
 
 interface ActivityMember {
   user_id: string
@@ -26,6 +26,14 @@ interface ActivityFiltersProps {
   onDateFromChange: (value: string) => void
   onDateToChange: (value: string) => void
   onClear: () => void
+}
+
+function toDate(iso: string): Date | undefined {
+  return iso ? new Date(iso) : undefined
+}
+
+function toIso(date: Date | undefined): string {
+  return date ? date.toISOString().split('T')[0] : ''
 }
 
 export function ActivityFilters({
@@ -56,20 +64,20 @@ export function ActivityFilters({
         </SelectContent>
       </Select>
 
-      <Input
-        type="date"
-        className="w-40"
-        value={dateFrom}
-        onChange={(e) => onDateFromChange(e.target.value)}
-        placeholder="From"
+      <DatePicker
+        value={toDate(dateFrom)}
+        onChange={(d) => onDateFromChange(toIso(d))}
+        placeholder="From date"
+        className="w-44"
+        toDate={toDate(dateTo)}
       />
 
-      <Input
-        type="date"
-        className="w-40"
-        value={dateTo}
-        onChange={(e) => onDateToChange(e.target.value)}
-        placeholder="To"
+      <DatePicker
+        value={toDate(dateTo)}
+        onChange={(d) => onDateToChange(toIso(d))}
+        placeholder="To date"
+        className="w-44"
+        fromDate={toDate(dateFrom)}
       />
 
       {hasFilters && (
