@@ -1,6 +1,11 @@
 /**
  * Server-side auth helpers used in Route Handlers.
  *
+ * Role model:
+ *   - platform_owner: Muneeb — can manage all orgs across the platform (is_platform_owner = true on profiles)
+ *   - admin:  user who signed up — org is auto-created for them, they are the org admin
+ *   - member: user invited into an org by an admin
+ *
  * Pattern for every API route:
  *   const { user, error } = await getAuthUser()
  *   if (error) return NextResponse.json({ error }, { status: 401 })
@@ -9,9 +14,8 @@
  *   if (memberError) return NextResponse.json({ error: memberError }, { status: 403 })
  */
 
-import { createServerClient } from '@/lib/supabase/server'
-import { createServiceClient } from '@/lib/supabase/server'
-import type { OrgRole, SessionUser } from '@/types'
+import { createServerClient, createServiceClient } from '@/lib/supabase/server'
+import type { OrgRole, Profile, SessionUser } from '@/types'
 
 // ─── Get the authenticated user from the current session ─────────────────────
 
@@ -55,14 +59,24 @@ export async function requireOrgMember(
   return { member: data, error: null }
 }
 
-// ─── Role permission checks ───────────────────────────────────────────────────
+// ─── Role permission checks (org-level) ──────────────────────────────────────
 
-export function isOwner(role: OrgRole): boolean {
-  return role === 'owner'
+/** Only org admins can manage members, projects, and org settings */
+export function isAdmin(role: OrgRole): boolean {
+  return role === 'admin'
 }
 
-export function isAdminOrOwner(role: OrgRole): boolean {
-  return role === 'owner' || role === 'admin'
+// ─── Platform owner check ────────────────────────────────────────────────────
+
+/** Returns true if the user is the platform owner (Muneeb) */
+export async function isPlatformOwner(userId: string): Promise<boolean> {
+  const supabase = await createServiceClient()
+  const { data } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single()
+  return (data as Profile | null)?.is_platform_owner === true
 }
 
 // ─── Get org by slug ─────────────────────────────────────────────────────────

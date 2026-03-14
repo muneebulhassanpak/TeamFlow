@@ -16,6 +16,7 @@ export type Notification = Database['public']['Tables']['notifications']['Row']
 
 export type TaskStatus = Database['public']['Enums']['task_status']
 export type TaskPriority = Database['public']['Enums']['task_priority']
+// org_role: 'admin' = org creator (auto-assigned on signup), 'member' = invited user
 export type OrgRole = Database['public']['Enums']['org_role']
 export type OrgPlan = Database['public']['Enums']['org_plan']
 
