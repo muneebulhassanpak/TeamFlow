@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Search } from "lucide-react"
+import { Search, SearchX, Users } from "lucide-react"
 import {
   parseAsInteger,
   parseAsString,
@@ -11,6 +11,14 @@ import {
 
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
 import { useMembers } from "@/features/members/hooks/use-members"
 import { MembersTable } from "./members-table"
 import { InviteDialog } from "./invite-dialog"
@@ -119,7 +127,47 @@ export function MembersView({ currentUserId }: MembersViewProps) {
           ))}
         </div>
       ) : error ? (
-        <p className="text-sm text-destructive">{(error as Error).message}</p>
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Users />
+            </EmptyMedia>
+            <EmptyTitle>Failed to load members</EmptyTitle>
+            <EmptyDescription>{(error as Error).message}</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : members.length === 0 ? (
+        filters.q ? (
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <SearchX />
+              </EmptyMedia>
+              <EmptyTitle>No members found</EmptyTitle>
+              <EmptyDescription>
+                No members match &ldquo;{filters.q}&rdquo;. Try a different
+                search.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        ) : (
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <Users />
+              </EmptyMedia>
+              <EmptyTitle>No members yet</EmptyTitle>
+              <EmptyDescription>
+                Invite your team to start collaborating in {org.name}.
+              </EmptyDescription>
+            </EmptyHeader>
+            {isAdmin && (
+              <EmptyContent>
+                <InviteDialog />
+              </EmptyContent>
+            )}
+          </Empty>
+        )
       ) : (
         <MembersTable
           data={members}
