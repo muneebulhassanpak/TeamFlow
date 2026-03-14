@@ -1,18 +1,17 @@
-'use client'
+"use client"
 
-import * as React from 'react'
-import { MoreHorizontal, ArrowUpDown, Loader2, Search } from 'lucide-react'
+import { MoreHorizontal, ArrowUpDown, Loader2 } from "lucide-react"
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { SharedPagination } from "@/components/shared/pagination"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from "@/components/ui/dropdown-menu"
 import {
   Table,
   TableBody,
@@ -20,14 +19,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useRemoveMember, type MemberRow } from '@/features/members/hooks/use-members'
-import { useOrg } from '@/features/app-shell/context/org-context'
+} from "@/components/ui/table"
+import {
+  useRemoveMember,
+  type MemberRow,
+} from "@/features/members/hooks/use-members"
+import { useOrg } from "@/features/app-shell/context/org-context"
 
 function getInitials(name: string | null, email: string) {
   if (name) {
-    const parts = name.trim().split(' ')
-    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    const parts = name.trim().split(" ")
+    if (parts.length >= 2)
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
     return parts[0].slice(0, 2).toUpperCase()
   }
   return email.slice(0, 2).toUpperCase()
@@ -38,12 +41,10 @@ interface MembersTableProps {
   total: number
   page: number
   pageSize: number
-  search: string
-  sortDir: 'asc' | 'desc'
+  sortDir: "asc" | "desc"
   currentUserId: string
-  onSearchChange: (value: string) => void
   onPageChange: (page: number) => void
-  onSortDirChange: (dir: 'asc' | 'desc') => void
+  onSortDirChange: (dir: "asc" | "desc") => void
 }
 
 export function MembersTable({
@@ -51,49 +52,20 @@ export function MembersTable({
   total,
   page,
   pageSize,
-  search,
   sortDir,
   currentUserId,
-  onSearchChange,
   onPageChange,
   onSortDirChange,
 }: MembersTableProps) {
   const { org, role } = useOrg()
   const removeMember = useRemoveMember(org.id)
-  const isAdmin = role === 'admin'
-
-  // Local input state for debouncing the search URL param
-  const [inputValue, setInputValue] = React.useState(search)
-
-  // Sync local input if parent search changes (e.g. back/forward navigation)
-  React.useEffect(() => {
-    setInputValue(search)
-  }, [search])
-
-  // Debounce: push to URL only after 300 ms of no typing
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      if (inputValue !== search) onSearchChange(inputValue)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [inputValue]) // eslint-disable-line react-hooks/exhaustive-deps
+  const isAdmin = role === "admin"
 
   const pageCount = Math.ceil(total / pageSize)
   const colSpan = isAdmin ? 4 : 3
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Search bar */}
-      <div className="relative w-64">
-        <Search className="text-muted-foreground absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-        <Input
-          placeholder="Search members…"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          className="pl-8 text-sm"
-        />
-      </div>
-
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -104,7 +76,9 @@ export function MembersTable({
                   variant="ghost"
                   size="sm"
                   className="-ml-3 h-8"
-                  onClick={() => onSortDirChange(sortDir === 'asc' ? 'desc' : 'asc')}
+                  onClick={() =>
+                    onSortDirChange(sortDir === "asc" ? "desc" : "asc")
+                  }
                 >
                   Role
                   <ArrowUpDown className="ml-2 size-3.5" />
@@ -122,7 +96,10 @@ export function MembersTable({
                     <div className="flex items-center gap-3">
                       <Avatar className="size-8">
                         {m.avatar_url && (
-                          <AvatarImage src={m.avatar_url} alt={m.full_name ?? m.email} />
+                          <AvatarImage
+                            src={m.avatar_url}
+                            alt={m.full_name ?? m.email}
+                          />
                         )}
                         <AvatarFallback className="text-xs">
                           {getInitials(m.full_name, m.email)}
@@ -130,20 +107,28 @@ export function MembersTable({
                       </Avatar>
                       <div className="flex flex-col">
                         {m.full_name && (
-                          <span className="text-sm font-medium">{m.full_name}</span>
+                          <span className="text-sm font-medium">
+                            {m.full_name}
+                          </span>
                         )}
-                        <span className="text-muted-foreground text-xs">{m.email}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {m.email}
+                        </span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={m.role === 'admin' ? 'default' : 'secondary'}>{m.role}</Badge>
+                    <Badge
+                      variant={m.role === "admin" ? "default" : "secondary"}
+                    >
+                      {m.role}
+                    </Badge>
                   </TableCell>
                   <TableCell>
-                    {new Date(m.joined_at).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
+                    {new Date(m.joined_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
                     })}
                   </TableCell>
                   {isAdmin && (
@@ -152,8 +137,13 @@ export function MembersTable({
                         <div className="flex justify-end">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="size-8">
-                                {removeMember.isPending && removeMember.variables === m.user_id ? (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="size-8"
+                              >
+                                {removeMember.isPending &&
+                                removeMember.variables === m.user_id ? (
                                   <Loader2 className="size-4 animate-spin" />
                                 ) : (
                                   <MoreHorizontal className="size-4" />
@@ -187,31 +177,11 @@ export function MembersTable({
       </div>
 
       {/* Pagination */}
-      {pageCount > 1 && (
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">
-            Page {page} of {pageCount}
-          </span>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(page - 1)}
-              disabled={page <= 1}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(page + 1)}
-              disabled={page >= pageCount}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      )}
+      <SharedPagination
+        page={page}
+        pageCount={pageCount}
+        onPageChange={onPageChange}
+      />
     </div>
   )
 }
