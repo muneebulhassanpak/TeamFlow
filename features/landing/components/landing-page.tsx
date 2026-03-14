@@ -234,7 +234,7 @@ function HeroSection() {
         >
           <Button size="lg" asChild>
             <Link href="/signup">
-              Get started for free <ArrowRight className="ml-2 size-4" />
+              Get started for free <ArrowRight className="size-4" />
             </Link>
           </Button>
           <Button size="lg" variant="outline" asChild>
