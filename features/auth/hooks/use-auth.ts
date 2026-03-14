@@ -13,12 +13,23 @@ export function useLogin() {
   return useMutation({
     mutationFn: async ({ email, password }: LoginInput) => {
       const supabase = createClient()
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw new Error(error.message)
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('onboarding_completed, default_org_slug')
+        .eq('id', data.user.id)
+        .single()
+
+      return profile
     },
-    onSuccess: () => {
-      // Middleware will redirect to onboarding or dashboard based on profile state
-      router.refresh()
+    onSuccess: (profile) => {
+      if (!profile?.onboarding_completed) {
+        router.push('/onboarding')
+      } else {
+        router.push(`/${profile.default_org_slug}/dashboard`)
+      }
     },
   })
 }
