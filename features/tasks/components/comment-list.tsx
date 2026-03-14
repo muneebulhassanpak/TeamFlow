@@ -4,7 +4,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useComments } from '../hooks/use-comments'
 import { CommentItem } from './comment-item'
-import { CommentInput } from './comment-input'
 
 interface CommentListProps {
   taskId: string
@@ -17,13 +16,6 @@ export function CommentList({ taskId, currentUserId, currentUserRole }: CommentL
 
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium">
-        Comments
-        {comments && comments.length > 0 && (
-          <span className="text-muted-foreground ml-1.5 text-xs font-normal">{comments.length}</span>
-        )}
-      </h4>
-
       {isLoading ? (
         <CommentListSkeleton />
       ) : comments && comments.length > 0 ? (
@@ -41,8 +33,6 @@ export function CommentList({ taskId, currentUserId, currentUserRole }: CommentL
       ) : (
         <p className="text-muted-foreground text-sm">No comments yet.</p>
       )}
-
-      <CommentInput taskId={taskId} />
     </div>
   )
 }
