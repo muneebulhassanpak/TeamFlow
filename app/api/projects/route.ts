@@ -22,14 +22,19 @@ export async function GET(req: NextRequest) {
   if (!orgId)
     return NextResponse.json({ error: "orgId required" }, { status: 400 })
 
+  const search = req.nextUrl.searchParams.get("search") || ""
+  const page = parseInt(req.nextUrl.searchParams.get("page") || "1", 10)
+  const pageSize = parseInt(req.nextUrl.searchParams.get("pageSize") || "10", 10)
+  const sortBy = req.nextUrl.searchParams.get("sortBy") || "created_at"
+  const sortDir = req.nextUrl.searchParams.get("sortDir") === "asc" ? "asc" : "desc"
+
   const { member, error: memberError } = await requireOrgMember(user.id, orgId)
   if (memberError || !member)
     return NextResponse.json({ error: memberError }, { status: 403 })
 
   const supabase = createServiceClient()
 
-  // Get projects with member count and task counts
-  const { data: projects, error: projectsError } = await supabase
+  let query = supabase
     .from("projects")
     .select(
       `
@@ -43,11 +48,25 @@ export async function GET(req: NextRequest) {
       created_by,
       project_members(count),
       tasks(count)
-    `
+    `,
+      { count: "exact" }
     )
     .eq("org_id", orgId)
     .eq("archived", false)
-    .order("created_at", { ascending: false })
+
+  if (search) {
+    query = query.ilike("name", `%${search}%`)
+  }
+
+  // Sorting
+  query = query.order(sortBy, { ascending: sortDir === "asc" })
+
+  // Pagination
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+  query = query.range(from, to)
+
+  const { data: projects, error: projectsError, count } = await query
 
   if (projectsError)
     return NextResponse.json({ error: projectsError.message }, { status: 500 })
@@ -69,7 +88,12 @@ export async function GET(req: NextRequest) {
       task_count: Array.isArray(project.tasks) ? project.tasks.length : 0,
     })) ?? []
 
-  return NextResponse.json({ data: transformedProjects })
+  return NextResponse.json({
+    data: transformedProjects,
+    total: count ?? 0,
+    page,
+    pageSize,
+  })
 }
 
 // POST /api/projects

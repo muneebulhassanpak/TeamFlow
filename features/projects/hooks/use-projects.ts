@@ -1,32 +1,65 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { projectKeys } from "@/lib/query-keys"
 import { CreateProjectInput, UpdateProjectInput } from "../validations/projects"
+import { keepPreviousData } from "@tanstack/react-query"
+
+export interface ProjectRow {
+  id: string
+  name: string
+  description: string | null
+  color: string
+  archived: boolean
+  created_at: string
+  updated_at: string
+  created_by: string
+  member_count: number
+  task_count: number
+}
+
+export interface ProjectsQueryParams {
+  search?: string
+  page?: number
+  pageSize?: number
+  sortBy?: "name" | "created_at"
+  sortDir?: "asc" | "desc"
+}
+
+export interface ProjectsResponse {
+  data: ProjectRow[]
+  total: number
+  page: number
+  pageSize: number
+}
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
-export function useProjects(orgId: string) {
+export function useProjects(orgId: string, params: ProjectsQueryParams = {}) {
+  const {
+    search = "",
+    page = 1,
+    pageSize = 10,
+    sortBy = "created_at",
+    sortDir = "desc",
+  } = params
+
   return useQuery({
-    queryKey: projectKeys.all(orgId),
-    queryFn: async () => {
-      const res = await fetch(`/api/projects?orgId=${orgId}`)
-      if (!res.ok) {
-        const json = await res.json()
-        throw new Error(json.error ?? "Failed to fetch projects")
-      }
+    queryKey: projectKeys.all(orgId, { search, page, pageSize, sortBy, sortDir }),
+    queryFn: async (): Promise<ProjectsResponse> => {
+      const url = new URL("/api/projects", window.location.origin)
+      url.searchParams.set("orgId", orgId)
+      if (search) url.searchParams.set("search", search)
+      url.searchParams.set("page", String(page))
+      url.searchParams.set("pageSize", String(pageSize))
+      url.searchParams.set("sortBy", sortBy)
+      url.searchParams.set("sortDir", sortDir)
+      
+      const res = await fetch(url.toString())
       const json = await res.json()
-      return json.data as Array<{
-        id: string
-        name: string
-        description: string | null
-        color: string
-        archived: boolean
-        created_at: string
-        updated_at: string
-        created_by: string
-        member_count: number
-        task_count: number
-      }>
+      if (!res.ok) throw new Error(json.error ?? "Failed to fetch projects")
+      return json
     },
+    enabled: !!orgId,
+    placeholderData: keepPreviousData,
   })
 }
 

@@ -99,7 +99,7 @@ export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
               onClick={goBack}
               disabled={isSubmitting}
             >
-              <ChevronLeft className="mr-1 size-4" />
+              <ChevronLeft className="size-4" />
               Back
             </Button>
 
