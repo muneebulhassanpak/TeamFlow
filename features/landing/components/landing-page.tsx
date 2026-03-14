@@ -191,7 +191,7 @@ function HeroSection() {
   return (
     <section className="relative overflow-hidden py-24 md:py-32">
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute top-0 left-1/2 h-150 w-225 -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
       </div>
 
       <div className="mx-auto max-w-6xl px-6 text-center">
@@ -222,9 +222,8 @@ function HeroSection() {
           transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
           className="mx-auto mb-10 max-w-xl text-lg text-muted-foreground"
         >
-          TeamFlow brings your team together with real-time Kanban boards,
-          smart task management, and powerful collaboration tools — all in one
-          place.
+          TeamFlow brings your team together with real-time Kanban boards, smart
+          task management, and powerful collaboration tools — all in one place.
         </motion.p>
 
         <motion.div
@@ -274,7 +273,7 @@ function HeroSection() {
                       key={card.title}
                       className="rounded-md border bg-background p-2 text-left shadow-sm"
                     >
-                      <p className="text-xs font-medium leading-snug">
+                      <p className="text-xs leading-snug font-medium">
                         {card.title}
                       </p>
                       <span
@@ -493,17 +492,26 @@ function LandingFooter() {
             <h4 className="text-sm font-semibold">Product</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link href="#features" className="transition-colors hover:text-foreground">
+                <Link
+                  href="#features"
+                  className="transition-colors hover:text-foreground"
+                >
                   Features
                 </Link>
               </li>
               <li>
-                <Link href="#pricing" className="transition-colors hover:text-foreground">
+                <Link
+                  href="#pricing"
+                  className="transition-colors hover:text-foreground"
+                >
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link href="/changelog" className="transition-colors hover:text-foreground">
+                <Link
+                  href="/changelog"
+                  className="transition-colors hover:text-foreground"
+                >
                   Changelog
                 </Link>
               </li>
@@ -514,17 +522,26 @@ function LandingFooter() {
             <h4 className="text-sm font-semibold">Company</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link href="/about" className="transition-colors hover:text-foreground">
+                <Link
+                  href="/about"
+                  className="transition-colors hover:text-foreground"
+                >
                   About
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="transition-colors hover:text-foreground">
+                <Link
+                  href="/blog"
+                  className="transition-colors hover:text-foreground"
+                >
                   Blog
                 </Link>
               </li>
               <li>
-                <Link href="/careers" className="transition-colors hover:text-foreground">
+                <Link
+                  href="/careers"
+                  className="transition-colors hover:text-foreground"
+                >
                   Careers
                 </Link>
               </li>
@@ -535,12 +552,18 @@ function LandingFooter() {
             <h4 className="text-sm font-semibold">Legal</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link href="/privacy" className="transition-colors hover:text-foreground">
+                <Link
+                  href="/privacy"
+                  className="transition-colors hover:text-foreground"
+                >
                   Privacy
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="transition-colors hover:text-foreground">
+                <Link
+                  href="/terms"
+                  className="transition-colors hover:text-foreground"
+                >
                   Terms
                 </Link>
               </li>
