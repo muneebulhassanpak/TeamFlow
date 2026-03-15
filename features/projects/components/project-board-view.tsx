@@ -3,6 +3,7 @@
 import { KanbanBoard } from "@/features/tasks/components/kanban-board"
 import { TaskFilters } from "@/features/tasks/components/task-filters"
 import { TaskDetailsDialog } from "@/features/tasks/components/task-details-dialog"
+import { QuickTaskTitleDialog } from "@/features/tasks/components/quick-task-title-dialog"
 import { Button } from "@/components/ui/button"
 import { Plus, FolderOpen } from "lucide-react"
 import {
@@ -32,7 +33,10 @@ export function ProjectBoardView({ projectId, projectName, currentUserId, curren
     freshSelectedTask,
     setSelectedTask,
     isNewTask,
+    pendingCreateStatus,
     handleCreateTask,
+    handleQuickSubmit,
+    handleQuickCancel,
     handleCloseDialog,
   } = useProjectBoardView({ projectId })
 
@@ -111,6 +115,12 @@ export function ProjectBoardView({ projectId, projectName, currentUserId, curren
           />
         )}
       </div>
+
+      <QuickTaskTitleDialog
+        open={!!pendingCreateStatus}
+        onSubmit={handleQuickSubmit}
+        onCancel={handleQuickCancel}
+      />
 
       <TaskDetailsDialog
         key={freshSelectedTask?.id}

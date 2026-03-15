@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { toast } from "sonner"
 import { parseAsString, useQueryState } from "nuqs"
 import { TaskRow, useCreateTask, useReorderTasks, useTaskRealtime, useTasks } from "@/features/tasks/hooks/use-tasks"
 
@@ -22,26 +21,35 @@ export function useProjectBoardView({ projectId }: UseProjectBoardViewOptions) {
 
   const [selectedTask, setSelectedTask] = useState<TaskRow | null>(null)
   const [isNewTask, setIsNewTask] = useState(false)
+  const [pendingCreateStatus, setPendingCreateStatus] = useState<TaskRow["status"] | null>(null)
 
   // Always reflect latest cache data in the open dialog
   const freshSelectedTask = selectedTask
     ? (tasks.find((t) => t.id === selectedTask.id) ?? selectedTask)
     : null
 
-  async function handleCreateTask(status: TaskRow["status"]) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result: any = await createTask({ title: "Untitled", status, priority: "medium" })
-      const created: TaskRow = {
-        ...result.data,
-        completed_subtask_count: result.data.completed_subtask_count ?? 0,
-        comment_count: result.data.comment_count ?? 0,
-      }
-      setSelectedTask(created)
-      setIsNewTask(true)
-    } catch {
-      toast.error("Failed to create task")
+  // Step 1: open the title prompt
+  function handleCreateTask(status: TaskRow["status"]) {
+    setPendingCreateStatus(status)
+  }
+
+  // Step 2: user confirmed a title — create then open full dialog
+  async function handleQuickSubmit(title: string) {
+    if (!pendingCreateStatus) return
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result: any = await createTask({ title, status: pendingCreateStatus, priority: "medium" })
+    const created: TaskRow = {
+      ...result.data,
+      completed_subtask_count: result.data.completed_subtask_count ?? 0,
+      comment_count: result.data.comment_count ?? 0,
     }
+    setPendingCreateStatus(null)
+    setSelectedTask(created)
+    setIsNewTask(true)
+  }
+
+  function handleQuickCancel() {
+    setPendingCreateStatus(null)
   }
 
   function handleCloseDialog() {
@@ -57,7 +65,10 @@ export function useProjectBoardView({ projectId }: UseProjectBoardViewOptions) {
     freshSelectedTask,
     setSelectedTask,
     isNewTask,
+    pendingCreateStatus,
     handleCreateTask,
+    handleQuickSubmit,
+    handleQuickCancel,
     handleCloseDialog,
   }
 }
