@@ -175,9 +175,28 @@ export function useReorderTasks(projectId: string) {
       }
       return res.json()
     },
-    onSuccess: () => {
-      // Invalidate the base key for tasks so all filtered views update
-      queryClient.invalidateQueries({ queryKey: taskKeys.all(projectId) })
+    onMutate: async ({ tasks: items }) => {
+      await queryClient.cancelQueries({ queryKey: ["tasks", projectId] })
+      const previousEntries = queryClient.getQueriesData<TaskRow[]>({
+        queryKey: ["tasks", projectId],
+      })
+      const updates = new Map(
+        items.map((t) => [t.id, { status: t.status, position: t.position }])
+      )
+      queryClient.setQueriesData<TaskRow[]>(
+        { queryKey: ["tasks", projectId] },
+        (old) =>
+          old?.map((t) => {
+            const patch = updates.get(t.id)
+            return patch ? { ...t, ...patch } : t
+          }) ?? old
+      )
+      return { previousEntries }
+    },
+    onError: (_err, _vars, context) => {
+      context?.previousEntries.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data)
+      })
     },
   })
 }
