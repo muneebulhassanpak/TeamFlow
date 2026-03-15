@@ -76,7 +76,7 @@ export function AppSidebar({ userEmail, userFullName, userAvatarUrl, ...props }:
   const userInitials = getUserInitials(userFullName, userEmail)
 
   return (
-    <Sidebar variant="inset" {...props}>
+    <Sidebar variant="floating" {...props}>
       {/* Org header */}
       <SidebarHeader>
         <SidebarMenu>
