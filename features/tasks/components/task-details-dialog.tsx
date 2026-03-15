@@ -130,7 +130,7 @@ export function TaskDetailsDialog({
                     if (e.key === "Enter") { e.preventDefault(); saveTitle() }
                     if (e.key === "Escape") { e.preventDefault(); cancelTitle() }
                   }}
-                  className="h-auto border-none px-0 text-2xl font-bold leading-snug tracking-tight shadow-none focus-visible:ring-0"
+                  className="h-auto border-none px-0 py-0 text-2xl font-bold leading-snug tracking-tight shadow-none focus-visible:ring-0"
                   disabled={isUpdating}
                 />
               ) : (
@@ -232,7 +232,7 @@ export function TaskDetailsDialog({
                 ) : (
                   <div
                     onClick={() => setEditingDesc(true)}
-                    className="-mx-1 cursor-text rounded px-1 py-1 transition-colors hover:bg-muted/40"
+                    className="-mx-1 min-h-20 cursor-text rounded px-1 py-1 transition-colors hover:bg-muted/40"
                   >
                     {task.description ? (
                       <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/80">
