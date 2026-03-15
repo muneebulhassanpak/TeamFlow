@@ -78,22 +78,16 @@ export function ProjectBoardView({ projectId, projectName, currentUserId, curren
         {isLoading ? (
           <div className="flex h-[calc(100vh-14rem)] w-full gap-4 overflow-hidden pb-4">
             {[1, 2, 3, 4].map((colId) => (
-              <div
-                key={colId}
-                className="flex h-full min-w-70 flex-1 shrink-0 flex-col rounded-xl border bg-muted/40 pb-2"
-              >
-                <div className="flex items-center justify-between p-4">
-                  <Skeleton className="h-6 w-28 bg-muted-foreground/20" />
-                  <div className="flex gap-2">
-                    <Skeleton className="h-6 w-6 rounded-full bg-muted-foreground/20" />
-                    <Skeleton className="h-6 w-6 rounded-full bg-muted-foreground/20" />
-                  </div>
+              <div key={colId} className="flex w-72 shrink-0 flex-col">
+                <div className="flex items-center gap-2 px-1 py-3">
+                  <Skeleton className="h-4 w-20 bg-muted-foreground/20" />
+                  <Skeleton className="h-4 w-5 rounded-md bg-muted-foreground/20" />
                 </div>
-                <div className="flex flex-1 flex-col gap-3 px-4">
-                  <Skeleton className="h-30 w-full rounded-lg bg-muted-foreground/10" />
-                  <Skeleton className="h-30 w-full rounded-lg bg-muted-foreground/10" />
+                <div className="flex flex-1 flex-col gap-3 px-1">
+                  <Skeleton className="h-24 w-full rounded-xl bg-muted-foreground/10" />
+                  <Skeleton className="h-24 w-full rounded-xl bg-muted-foreground/10" />
                   {colId % 2 === 0 && (
-                    <Skeleton className="h-30 w-full rounded-lg bg-muted-foreground/10" />
+                    <Skeleton className="h-24 w-full rounded-xl bg-muted-foreground/10" />
                   )}
                 </div>
               </div>

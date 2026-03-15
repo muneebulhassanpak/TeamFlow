@@ -5,7 +5,7 @@ import { KanbanCard } from "./kanban-card"
 import { TaskRow } from "../hooks/use-tasks"
 import { useKanbanColumn } from "../hooks/use-kanban-column"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { Plus } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface KanbanColumnProps {
@@ -27,35 +27,34 @@ export function KanbanColumn({
   const { taskIds, setNodeRef, isOver } = useKanbanColumn(id, tasks)
 
   return (
-    <div className="flex h-[calc(100vh-14rem)] flex-1 shrink-0 flex-col rounded-xl border bg-muted/40 pb-2">
-      <div className="flex items-center justify-between p-4">
-        <h3 className="font-semibold">{title}</h3>
+    <div className="flex h-[calc(100vh-14rem)] w-72 shrink-0 flex-col">
+      {/* Column header */}
+      <div className="flex items-center justify-between px-1 py-3">
         <div className="flex items-center gap-2">
-          <span className="flex size-5 items-center justify-center rounded-full bg-muted-foreground/20 text-xs font-medium text-foreground">
+          <h3 className="text-sm font-medium">{title}</h3>
+          <span className="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
             {tasks.length}
           </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 rounded-full text-muted-foreground hover:bg-muted-foreground/20"
-            onClick={() => onCreateTask?.(id)}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
         </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-7 text-muted-foreground"
+          onClick={() => onCreateTask?.(id)}
+        >
+          <MoreHorizontal className="size-4" />
+        </Button>
       </div>
 
-      <ScrollArea className="flex-1 px-4">
+      {/* Cards */}
+      <ScrollArea className="flex-1">
         <div
           ref={setNodeRef}
           className={`flex min-h-37.5 flex-col gap-3 pb-4 transition-colors ${
-            isOver ? "-m-2 mb-2 rounded-lg bg-accent/50 p-2" : ""
+            isOver ? "rounded-xl bg-muted/50 p-2" : "px-1"
           }`}
         >
-          <SortableContext
-            items={taskIds}
-            strategy={verticalListSortingStrategy}
-          >
+          <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
             {tasks.map((task) => (
               <KanbanCard
                 key={task.id}
