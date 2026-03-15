@@ -2,7 +2,7 @@
 
 import { Skeleton } from '@/components/ui/skeleton'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { useComments } from '../hooks/use-comments'
+import { useCommentList } from '../hooks/use-comment-list'
 import { CommentItem } from './comment-item'
 
 interface CommentListProps {
@@ -12,7 +12,7 @@ interface CommentListProps {
 }
 
 export function CommentList({ taskId, currentUserId, currentUserRole }: CommentListProps) {
-  const { data: comments, isLoading } = useComments(taskId)
+  const { comments, isLoading, bottomRef } = useCommentList(taskId)
 
   return (
     <div className="space-y-3">
@@ -33,6 +33,7 @@ export function CommentList({ taskId, currentUserId, currentUserRole }: CommentL
       ) : (
         <p className="text-muted-foreground text-sm">No comments yet.</p>
       )}
+      <div ref={bottomRef} />
     </div>
   )
 }
