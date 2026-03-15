@@ -60,7 +60,7 @@ export function CreateTaskDialog({ projectId, children, defaultStatus }: CreateT
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-125">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <DialogHeader>

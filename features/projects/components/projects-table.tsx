@@ -108,7 +108,7 @@ export function ProjectsTable({
               <TableHead>Members</TableHead>
               <TableHead>Tasks</TableHead>
               <TableHead>Created</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className="w-12.5"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -164,7 +164,7 @@ export function ProjectsTable({
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="max-w-[200px] truncate text-muted-foreground">
+                  <TableCell className="max-w-50 truncate text-muted-foreground">
                     {project.description || "-"}
                   </TableCell>
                   <TableCell>
