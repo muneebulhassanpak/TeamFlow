@@ -24,7 +24,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
-  CalendarIcon,
   Clock,
   Flag,
   CheckCircle2,
@@ -42,6 +41,7 @@ import { SubtaskList } from "./subtask-list"
 import { CommentList } from "./comment-list"
 import { CommentInput } from "./comment-input"
 import { useProjectMembers } from "@/features/projects/hooks/use-projects"
+import { DatePicker } from "@/components/shared/date-picker"
 
 interface TaskDetailsDialogProps {
   task: TaskRow | null
@@ -338,22 +338,17 @@ export function TaskDetailsDialog({
               </div>
 
               {/* Due date */}
-              <div className="flex items-center gap-2">
-                <CalendarIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <Input
-                  type="date"
-                  defaultValue={
-                    task.due_date ? task.due_date.split("T")[0] : ""
-                  }
-                  onBlur={(e) =>
-                    updateField({
-                      taskId: task.id,
-                      due_date: e.target.value || null,
-                    })
-                  }
-                  className="h-auto w-auto border-none bg-transparent p-0 text-sm font-medium shadow-none focus-visible:ring-0"
-                />
-              </div>
+              <DatePicker
+                value={task.due_date ? new Date(task.due_date) : undefined}
+                onChange={(d) =>
+                  updateField({
+                    taskId: task.id,
+                    due_date: d ? d.toISOString().split("T")[0] : null,
+                  })
+                }
+                placeholder="No due date"
+                className="h-auto w-auto border-none bg-transparent px-0 text-sm font-medium shadow-none hover:bg-transparent"
+              />
 
               {/* Assignee */}
               <div className="ml-auto flex items-center gap-2">
