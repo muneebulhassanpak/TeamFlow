@@ -1,9 +1,8 @@
 'use client'
 
-import * as React from 'react'
 import { Plus } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useSubtasks, useCreateSubtask, useUpdateSubtask, useDeleteSubtask } from '../hooks/use-subtasks'
+import { useSubtaskList } from '../hooks/use-subtask-list'
 import { SubtaskItem } from './subtask-item'
 
 interface SubtaskListProps {
@@ -11,29 +10,18 @@ interface SubtaskListProps {
 }
 
 export function SubtaskList({ taskId }: SubtaskListProps) {
-  const [newTitle, setNewTitle] = React.useState('')
-  const { data: subtasks, isLoading } = useSubtasks(taskId)
-  const create = useCreateSubtask(taskId)
-  const update = useUpdateSubtask(taskId)
-  const remove = useDeleteSubtask(taskId)
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      handleAdd()
-    }
-    if (e.key === 'Escape') setNewTitle('')
-  }
-
-  function handleAdd() {
-    const title = newTitle.trim()
-    if (!title) return
-    setNewTitle('')
-    create.mutate({ title })
-  }
-
-  const completed = subtasks?.filter((s) => s.completed).length ?? 0
-  const total = subtasks?.length ?? 0
+  const {
+    subtasks,
+    isLoading,
+    newTitle,
+    setNewTitle,
+    completed,
+    total,
+    handleKeyDown,
+    handleAdd,
+    onToggle,
+    onDelete,
+  } = useSubtaskList(taskId)
 
   return (
     <div className="space-y-2">
@@ -56,14 +44,13 @@ export function SubtaskList({ taskId }: SubtaskListProps) {
             <SubtaskItem
               key={subtask.id}
               subtask={subtask}
-              onToggle={(id, completed) => update.mutate({ subtaskId: id, completed })}
-              onDelete={(id) => remove.mutate(id)}
+              onToggle={onToggle}
+              onDelete={onDelete}
             />
           ))}
         </div>
       )}
 
-      {/* Add subtask input */}
       <div className="flex items-center gap-2 pt-1">
         <Plus className="text-muted-foreground size-3.5 shrink-0" />
         <input

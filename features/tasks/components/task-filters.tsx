@@ -1,8 +1,6 @@
 "use client"
 
-import { parseAsString, useQueryState } from "nuqs"
 import { Search, X } from "lucide-react"
-
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -12,35 +10,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useProjectMembers } from "@/features/projects/hooks/use-projects"
+import { useTaskFilters } from "../hooks/use-task-filters"
 
 export function TaskFilters({ projectId }: { projectId: string }) {
-  const [search, setSearch] = useQueryState(
-    "search",
-    parseAsString.withDefault("")
-  )
-  const [priority, setPriority] = useQueryState(
-    "priority",
-    parseAsString.withDefault("")
-  )
-  const [assigneeId, setAssigneeId] = useQueryState(
-    "assigneeId",
-    parseAsString.withDefault("")
-  )
-
-  const { data: members, isLoading: isLoadingMembers } = useProjectMembers(projectId)
-
-  const hasFilters = search !== "" || priority !== "" || assigneeId !== ""
-
-  const clearFilters = () => {
-    setSearch("")
-    setPriority("")
-    setAssigneeId("")
-  }
+  const {
+    search,
+    setSearch,
+    priority,
+    setPriority,
+    assigneeId,
+    setAssigneeId,
+    members,
+    isLoadingMembers,
+    hasFilters,
+    clearFilters,
+  } = useTaskFilters(projectId)
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-      <div className="relative w-full sm:w-[250px]">
+      <div className="relative w-full sm:w-62.5">
         <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search fields..."
@@ -54,7 +42,7 @@ export function TaskFilters({ projectId }: { projectId: string }) {
         value={priority === "" ? "all" : priority}
         onValueChange={(val) => setPriority(val === "all" ? "" : val)}
       >
-        <SelectTrigger className="w-full sm:w-[150px]">
+        <SelectTrigger className="w-full sm:w-37.5">
           <SelectValue placeholder="Priority" />
         </SelectTrigger>
         <SelectContent>
@@ -71,7 +59,7 @@ export function TaskFilters({ projectId }: { projectId: string }) {
         onValueChange={(val) => setAssigneeId(val === "all" ? "" : val)}
         disabled={isLoadingMembers}
       >
-        <SelectTrigger className="w-full sm:w-[180px]">
+        <SelectTrigger className="w-full sm:w-45">
           <SelectValue placeholder="Assignee" />
         </SelectTrigger>
         <SelectContent>

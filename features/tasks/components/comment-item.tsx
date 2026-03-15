@@ -1,12 +1,12 @@
 'use client'
 
-import * as React from 'react'
 import { Loader2, Pencil, Trash2, X, Check } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { useUpdateComment, useDeleteComment } from '../hooks/use-comments'
+import { useCommentItem } from '../hooks/use-comment-item'
+import { getInitials, formatRelativeTime } from '../utils'
 import type { TaskCommentWithAuthor } from '@/types'
 
 interface CommentItemProps {
@@ -16,49 +16,20 @@ interface CommentItemProps {
   currentUserRole: string
 }
 
-function getInitials(name: string | null) {
-  if (!name) return '?'
-  return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
-}
-
-function formatRelativeTime(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  const hrs = Math.floor(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
-  const days = Math.floor(hrs / 24)
-  if (days < 7) return `${days}d ago`
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-}
-
 export function CommentItem({ comment, taskId, currentUserId, currentUserRole }: CommentItemProps) {
-  const [editing, setEditing] = React.useState(false)
-  const [editBody, setEditBody] = React.useState(comment.body)
-  const updateComment = useUpdateComment(taskId)
-  const deleteComment = useDeleteComment(taskId)
-
-  const isAuthor = comment.author_id === currentUserId
-  const canEdit = isAuthor
-  const canDelete = isAuthor || currentUserRole === 'admin'
-
-  function handleSaveEdit() {
-    const trimmed = editBody.trim()
-    if (!trimmed || trimmed === comment.body) {
-      setEditing(false)
-      return
-    }
-    updateComment.mutate(
-      { commentId: comment.id, body: trimmed },
-      { onSuccess: () => setEditing(false) },
-    )
-  }
-
-  function handleCancelEdit() {
-    setEditBody(comment.body)
-    setEditing(false)
-  }
+  const {
+    editing,
+    setEditing,
+    editBody,
+    setEditBody,
+    isUpdating,
+    isDeleting,
+    canEdit,
+    canDelete,
+    handleSaveEdit,
+    handleCancelEdit,
+    handleDelete,
+  } = useCommentItem({ comment, taskId, currentUserId, currentUserRole })
 
   return (
     <div className="flex gap-3">
@@ -86,8 +57,8 @@ export function CommentItem({ comment, taskId, currentUserId, currentUserRole }:
               autoFocus
             />
             <div className="flex gap-1.5">
-              <Button size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs" onClick={handleSaveEdit} disabled={updateComment.isPending}>
-                {updateComment.isPending ? <Loader2 className="size-3 animate-spin" /> : <Check className="size-3" />}
+              <Button size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs" onClick={handleSaveEdit} disabled={isUpdating}>
+                {isUpdating ? <Loader2 className="size-3 animate-spin" /> : <Check className="size-3" />}
                 Save
               </Button>
               <Button size="sm" variant="ghost" className="h-7 gap-1 px-2 text-xs" onClick={handleCancelEdit}>
@@ -96,13 +67,12 @@ export function CommentItem({ comment, taskId, currentUserId, currentUserRole }:
             </div>
           </div>
         ) : (
-          <p className={cn('mt-0.5 text-sm', deleteComment.isPending && 'opacity-50')}>
+          <p className={cn('mt-0.5 text-sm', isDeleting && 'opacity-50')}>
             {comment.body}
           </p>
         )}
       </div>
 
-      {/* Actions — visible on hover */}
       {!editing && (
         <div className="invisible flex shrink-0 items-start gap-1 pt-0.5 group-hover:visible">
           {canEdit && (
@@ -116,10 +86,10 @@ export function CommentItem({ comment, taskId, currentUserId, currentUserRole }:
           )}
           {canDelete && (
             <button
-              onClick={() => deleteComment.mutate(comment.id)}
+              onClick={handleDelete}
               className="text-muted-foreground hover:text-destructive transition-colors"
               aria-label="Delete comment"
-              disabled={deleteComment.isPending}
+              disabled={isDeleting}
             >
               <Trash2 className="size-3.5" />
             </button>
