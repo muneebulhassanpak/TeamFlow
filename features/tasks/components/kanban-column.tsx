@@ -17,11 +17,17 @@ interface KanbanColumnProps {
   onTaskClick?: (task: TaskRow) => void
 }
 
-export function KanbanColumn({ projectId, id, title, tasks, onTaskClick }: KanbanColumnProps) {
+export function KanbanColumn({
+  projectId,
+  id,
+  title,
+  tasks,
+  onTaskClick,
+}: KanbanColumnProps) {
   const { taskIds, setNodeRef, isOver } = useKanbanColumn(id, tasks)
 
   return (
-    <div className="flex h-[calc(100vh-14rem)] min-w-70 flex-1 shrink-0 flex-col rounded-xl border bg-muted/40 pb-2">
+    <div className="flex h-[calc(100vh-14rem)] flex-1 shrink-0 flex-col rounded-xl border bg-muted/40 pb-2">
       <div className="flex items-center justify-between p-4">
         <h3 className="font-semibold">{title}</h3>
         <div className="flex items-center gap-2">
@@ -29,7 +35,11 @@ export function KanbanColumn({ projectId, id, title, tasks, onTaskClick }: Kanba
             {tasks.length}
           </span>
           <CreateTaskDialog projectId={projectId} defaultStatus={id}>
-            <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full text-muted-foreground hover:bg-muted-foreground/20">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 rounded-full text-muted-foreground hover:bg-muted-foreground/20"
+            >
               <Plus className="h-4 w-4" />
             </Button>
           </CreateTaskDialog>
@@ -40,12 +50,19 @@ export function KanbanColumn({ projectId, id, title, tasks, onTaskClick }: Kanba
         <div
           ref={setNodeRef}
           className={`flex min-h-37.5 flex-col gap-3 pb-4 transition-colors ${
-            isOver ? "bg-accent/50 rounded-lg p-2 -m-2 mb-2" : ""
+            isOver ? "-m-2 mb-2 rounded-lg bg-accent/50 p-2" : ""
           }`}
         >
-          <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
+          <SortableContext
+            items={taskIds}
+            strategy={verticalListSortingStrategy}
+          >
             {tasks.map((task) => (
-              <KanbanCard key={task.id} task={task} onClick={() => onTaskClick?.(task)} />
+              <KanbanCard
+                key={task.id}
+                task={task}
+                onClick={() => onTaskClick?.(task)}
+              />
             ))}
           </SortableContext>
         </div>
