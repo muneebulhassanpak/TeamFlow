@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import { Plus } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSubtaskList } from '../hooks/use-subtask-list'
@@ -10,18 +11,26 @@ interface SubtaskListProps {
 }
 
 export function SubtaskList({ taskId }: SubtaskListProps) {
+  const inputRef = React.useRef<HTMLInputElement>(null)
   const {
     subtasks,
     isLoading,
     newTitle,
     setNewTitle,
+    isAdding,
+    openAdding,
     completed,
     total,
     handleKeyDown,
-    handleAdd,
+    handleBlur,
     onToggle,
     onDelete,
   } = useSubtaskList(taskId)
+
+  // Focus the input whenever isAdding becomes true
+  React.useEffect(() => {
+    if (isAdding) inputRef.current?.focus()
+  }, [isAdding])
 
   return (
     <div className="space-y-3">
@@ -49,25 +58,25 @@ export function SubtaskList({ taskId }: SubtaskListProps) {
         </div>
       )}
 
-      {/* Add subtask */}
-      <div className="flex items-center gap-2 pt-1">
-        <input
-          type="text"
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={handleAdd}
-          placeholder="Add subtask…"
-          className="w-full bg-transparent text-sm text-muted-foreground outline-none placeholder:text-muted-foreground/60"
-        />
-      </div>
-      {!newTitle && (
+      {isAdding && (
+        <div className="flex items-center gap-3 rounded-md border bg-background px-3 py-2.5">
+          <input
+            ref={inputRef}
+            type="text"
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            placeholder="Subtask title…"
+            className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/60"
+          />
+        </div>
+      )}
+
+      {!isAdding && (
         <button
           type="button"
-          onClick={() => {
-            const el = document.querySelector<HTMLInputElement>(`input[placeholder="Add subtask…"]`)
-            el?.focus()
-          }}
+          onClick={openAdding}
           className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
         >
           <Plus className="size-3.5" />
