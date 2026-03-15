@@ -54,7 +54,7 @@ export function KanbanBoard({
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex h-full w-full gap-4 overflow-x-auto pb-4">
+      <div className="flex h-full w-full gap-8 overflow-x-auto pb-4">
         {COLUMNS.map((col) => (
           <KanbanColumn
             key={col.id}
