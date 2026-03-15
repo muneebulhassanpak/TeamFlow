@@ -1,9 +1,6 @@
 "use client"
 
-import { Loader2, Pencil, Trash2, X, Check } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useCommentItem } from "../hooks/use-comment-item"
 import { getInitials, formatRelativeTime } from "../utils"
@@ -22,106 +19,32 @@ export function CommentItem({
   currentUserId,
   currentUserRole,
 }: CommentItemProps) {
-  const {
-    editing,
-    setEditing,
-    editBody,
-    setEditBody,
-    isUpdating,
-    isDeleting,
-    canEdit,
-    canDelete,
-    handleSaveEdit,
-    handleCancelEdit,
-    handleDelete,
-  } = useCommentItem({ comment, taskId, currentUserId, currentUserRole })
+  const { isDeleting } = useCommentItem({ comment, taskId, currentUserId, currentUserRole })
 
   return (
-    <div className="flex gap-3">
-      <Avatar className="size-7 shrink-0">
-        <AvatarImage src={comment.author.avatar_url ?? undefined} />
-        <AvatarFallback className="text-xs">
-          {getInitials(comment.author.full_name)}
-        </AvatarFallback>
-      </Avatar>
+    <div className={cn("group rounded-lg bg-muted/50 p-3", isDeleting && "opacity-50")}>
+      {/* Header row: avatar + name + timestamp + actions */}
+      <div className="flex items-center gap-2">
+        <Avatar className="size-7 shrink-0">
+          <AvatarImage src={comment.author.avatar_url ?? undefined} />
+          <AvatarFallback className="text-xs">
+            {getInitials(comment.author.full_name)}
+          </AvatarFallback>
+        </Avatar>
 
-      <div className="group min-w-0 flex-1">
-        <div className="flex items-baseline gap-2">
-          <span className="text-xs font-medium">
-            {comment.author.full_name ?? "Unknown"}
-          </span>
-          <span className="text-xs text-muted-foreground">
-            {formatRelativeTime(comment.created_at)}
-          </span>
-          {comment.edited_at && (
-            <span className="text-xs text-muted-foreground">(edited)</span>
-          )}
-        </div>
+        <span className="flex-1 text-sm font-semibold leading-none">
+          {comment.author.full_name ?? "Unknown"}
+        </span>
 
-        {editing ? (
-          <div className="mt-1.5 space-y-2">
-            <Textarea
-              value={editBody}
-              onChange={(e) => setEditBody(e.target.value)}
-              rows={2}
-              className="resize-none text-sm"
-              autoFocus
-            />
-            <div className="flex gap-1.5">
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 gap-1 px-2 text-xs"
-                onClick={handleSaveEdit}
-                disabled={isUpdating}
-              >
-                {isUpdating ? (
-                  <Loader2 className="size-3 animate-spin" />
-                ) : (
-                  <Check className="size-3" />
-                )}
-                Save
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-7 gap-1 px-2 text-xs"
-                onClick={handleCancelEdit}
-              >
-                <X className="size-3" /> Cancel
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <p className={cn("mt-0.5 text-sm", isDeleting && "opacity-50")}>
-            {comment.body}
-          </p>
-        )}
+        <span className="text-xs text-muted-foreground">
+          {formatRelativeTime(comment.created_at)}
+        </span>
       </div>
 
-      {!editing && (
-        <div className="invisible flex shrink-0 items-start gap-1 pt-0.5 group-hover:visible">
-          {canEdit && (
-            <button
-              onClick={() => setEditing(true)}
-              className="text-muted-foreground transition-colors hover:text-foreground"
-              aria-label="Edit comment"
-            >
-              <Pencil className="size-3.5" />
-            </button>
-          )}
-          {canDelete && (
-            <button
-              onClick={handleDelete}
-              className="text-muted-foreground transition-colors hover:text-destructive"
-              aria-label="Delete comment"
-              disabled={isDeleting}
-            >
-              <Trash2 className="size-3.5" />
-            </button>
-          )}
-        </div>
-      )}
+      {/* Body — indented to align with the name */}
+      <div className="mt-2 pl-9">
+        <p className="text-sm leading-relaxed text-foreground/80">{comment.body}</p>
+      </div>
     </div>
   )
 }
