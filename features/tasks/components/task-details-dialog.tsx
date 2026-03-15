@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
+  CalendarIcon,
   Clock,
   Flag,
   CheckCircle2,
@@ -241,6 +242,139 @@ export function TaskDetailsDialog({
                 </DialogTitle>
               )}
 
+              {/* Properties */}
+              <div className="flex flex-col overflow-hidden rounded-lg border text-sm">
+                <div className="flex flex-col sm:flex-row">
+                  {/* Status */}
+                  <div className="flex items-center gap-3 border-b px-3 py-2">
+                    <div className="flex w-24 shrink-0 items-center gap-2 text-xs text-muted-foreground">
+                      <CheckCircle2 className="size-3.5 shrink-0" />
+                      <span>Status</span>
+                    </div>
+                    <Select
+                      value={task.status}
+                      onValueChange={(v) =>
+                        updateField({
+                          taskId: task.id,
+                          status: v as TaskRow["status"],
+                        })
+                      }
+                    >
+                      <SelectTrigger className="h-auto border-none bg-transparent p-0 text-sm shadow-none focus:ring-0 [&>svg]:ml-1 [&>svg]:opacity-40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todo">To Do</SelectItem>
+                        <SelectItem value="in_progress">In Progress</SelectItem>
+                        <SelectItem value="in_review">In Review</SelectItem>
+                        <SelectItem value="done">Done</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {/* Priority */}
+                  <div className="flex items-center gap-3 border-b px-3 py-2">
+                    <div className="flex w-24 shrink-0 items-center gap-2 text-xs text-muted-foreground">
+                      <Flag className="size-3.5 shrink-0" />
+                      <span>Priority</span>
+                    </div>
+                    <Select
+                      value={task.priority}
+                      onValueChange={(v) =>
+                        updateField({
+                          taskId: task.id,
+                          priority: v as TaskRow["priority"],
+                        })
+                      }
+                    >
+                      <SelectTrigger className="h-auto border-none bg-transparent p-0 shadow-none focus:ring-0 [&>svg]:ml-1 [&>svg]:opacity-40">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "pointer-events-none font-normal",
+                            priorityConfig[task.priority].color
+                          )}
+                        >
+                          {priorityConfig[task.priority].label}
+                        </Badge>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="urgent">Urgent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row">
+                  {/* Due Date */}
+                  <div className="flex items-center gap-3 border-b px-3 py-2">
+                    <div className="flex w-24 shrink-0 items-center gap-2 text-xs text-muted-foreground">
+                      <CalendarIcon className="size-3.5 shrink-0" />
+                      <span>Due date</span>
+                    </div>
+                    <DatePicker
+                      value={
+                        task.due_date ? new Date(task.due_date) : undefined
+                      }
+                      onChange={(d) =>
+                        updateField({
+                          taskId: task.id,
+                          due_date: d ? d.toISOString().split("T")[0] : null,
+                        })
+                      }
+                      placeholder="No due date"
+                      className="h-auto border-none bg-transparent px-0 text-sm font-normal shadow-none hover:bg-transparent [&>svg]:hidden"
+                    />
+                  </div>
+
+                  {/* Assignee */}
+                  <div className="flex items-center gap-3 px-3 py-2">
+                    <div className="flex w-24 shrink-0 items-center gap-2 text-xs text-muted-foreground">
+                      <User className="size-3.5 shrink-0" />
+                      <span>Assignee</span>
+                    </div>
+                    <Select
+                      value={task.assignee_id ?? "unassigned"}
+                      onValueChange={(v) =>
+                        updateField({
+                          taskId: task.id,
+                          assignee_id: v === "unassigned" ? null : v,
+                        })
+                      }
+                    >
+                      <SelectTrigger className="h-auto border-none bg-transparent p-0 shadow-none focus:ring-0 [&>svg]:ml-1 [&>svg]:opacity-40">
+                        {task.assignee ? (
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-5 w-5 border">
+                              <AvatarImage
+                                src={task.assignee.avatar_url ?? ""}
+                              />
+                              <AvatarFallback className="bg-primary/10 text-[9px] text-primary">
+                                {initials}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{task.assignee.full_name || "Unknown"}</span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">
+                            Unassigned
+                          </span>
+                        )}
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="unassigned">Unassigned</SelectItem>
+                        {members?.map((m) => (
+                          <SelectItem key={m.user_id} value={m.user_id}>
+                            {m.full_name || m.email}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
               {/* Description */}
               {editingDesc ? (
                 <Textarea
@@ -277,120 +411,6 @@ export function TaskDetailsDialog({
 
               {/* Subtasks */}
               <SubtaskList taskId={task.id} />
-            </div>
-
-            {/* Properties footer */}
-            <div className="flex shrink-0 flex-wrap items-center gap-4 border-t bg-muted/30 px-6 py-3">
-              {/* Status */}
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <Select
-                  value={task.status}
-                  onValueChange={(v) =>
-                    updateField({
-                      taskId: task.id,
-                      status: v as TaskRow["status"],
-                    })
-                  }
-                >
-                  <SelectTrigger className="h-auto border-none bg-transparent p-0 text-sm font-medium shadow-none focus:ring-0 [&>svg]:ml-1 [&>svg]:opacity-50">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="todo">To Do</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="in_review">In Review</SelectItem>
-                    <SelectItem value="done">Done</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Priority */}
-              <div className="flex items-center gap-2">
-                <Flag className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <Select
-                  value={task.priority}
-                  onValueChange={(v) =>
-                    updateField({
-                      taskId: task.id,
-                      priority: v as TaskRow["priority"],
-                    })
-                  }
-                >
-                  <SelectTrigger className="h-auto border-none bg-transparent p-0 shadow-none focus:ring-0 [&>svg]:ml-1 [&>svg]:opacity-50">
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "pointer-events-none font-normal",
-                        priorityConfig[task.priority].color
-                      )}
-                    >
-                      {priorityConfig[task.priority].label}
-                    </Badge>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="urgent">Urgent</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Due date */}
-              <DatePicker
-                value={task.due_date ? new Date(task.due_date) : undefined}
-                onChange={(d) =>
-                  updateField({
-                    taskId: task.id,
-                    due_date: d ? d.toISOString().split("T")[0] : null,
-                  })
-                }
-                placeholder="No due date"
-                className="h-auto w-auto border-none bg-transparent px-0 text-sm font-medium shadow-none hover:bg-transparent"
-              />
-
-              {/* Assignee */}
-              <div className="ml-auto flex items-center gap-2">
-                <User className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <Select
-                  value={task.assignee_id ?? "unassigned"}
-                  onValueChange={(v) =>
-                    updateField({
-                      taskId: task.id,
-                      assignee_id: v === "unassigned" ? null : v,
-                    })
-                  }
-                >
-                  <SelectTrigger className="h-auto border-none bg-transparent p-0 shadow-none focus:ring-0 [&>svg]:ml-1 [&>svg]:opacity-50">
-                    {task.assignee ? (
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-5 w-5 border">
-                          <AvatarImage src={task.assignee.avatar_url ?? ""} />
-                          <AvatarFallback className="bg-primary/10 text-[9px] text-primary">
-                            {initials}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm font-medium">
-                          {task.assignee.full_name || "Unknown"}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-sm text-muted-foreground">
-                        Unassigned
-                      </span>
-                    )}
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="unassigned">Unassigned</SelectItem>
-                    {members?.map((m) => (
-                      <SelectItem key={m.user_id} value={m.user_id}>
-                        {m.full_name || m.email}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
           </div>
 
