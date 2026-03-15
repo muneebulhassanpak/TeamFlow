@@ -7,10 +7,12 @@ import {
   DialogContent,
   DialogTitle,
   DialogDescription,
+  DialogClose,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { CalendarIcon, Clock, Flag, CheckCircle2, User, LayoutList, Maximize, Minimize, Edit2, Trash2 } from "lucide-react"
+import { CalendarIcon, Clock, Flag, CheckCircle2, User, LayoutList, Maximize, Minimize, Edit2, Trash2, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { priorityConfig, statusLabels } from "../utils"
 import { useTaskDetailsDialog } from "../hooks/use-task-details-dialog"
@@ -43,51 +45,57 @@ export function TaskDetailsDialog({ task, open, onOpenChange, currentUserId, cur
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
-          "p-0 overflow-hidden gap-0 border-muted transition-all duration-300 h-[85vh]",
+          "p-0 overflow-hidden gap-0 border-muted transition-all duration-300 flex flex-col h-[85vh] [&>button:last-child]:hidden",
           isExpanded ? "sm:max-w-[1100px]" : "sm:max-w-[900px]"
         )}
       >
-        {/* Header Actions */}
-        <div className="absolute right-10 top-3 flex items-center gap-1 z-50">
-          <button onClick={() => setIsEditDialogOpen(true)} className="rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none bg-transparent flex items-center justify-center p-1.5 hover:bg-muted text-muted-foreground" title="Edit Task">
-            <Edit2 className="size-3.5" /><span className="sr-only">Edit Task</span>
-          </button>
-          <button onClick={handleDelete} className="rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none bg-transparent flex items-center justify-center p-1.5 hover:bg-destructive/10 hover:text-destructive text-muted-foreground" title="Delete Task">
-            <Trash2 className="size-3.5" /><span className="sr-only">Delete Task</span>
-          </button>
-          <button onClick={() => setIsExpanded(!isExpanded)} className="rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none bg-transparent flex items-center justify-center p-1.5 hover:bg-muted text-muted-foreground" title={isExpanded ? "Collapse" : "Expand"}>
-            {isExpanded ? <Minimize className="size-3.5" /> : <Maximize className="size-3.5" />}
-            <span className="sr-only">{isExpanded ? "Collapse" : "Expand"}</span>
-          </button>
-        </div>
-
         <div className="sr-only">
           <DialogDescription>Task details for {task.title}</DialogDescription>
         </div>
 
-        {/* Two-column layout */}
-        <div className="flex h-full min-h-0">
+        {/* Shared top bar */}
+        <div className="flex items-center justify-between gap-1 px-3 py-2 border-b shrink-0">
+          {/* Meta: type + date */}
+          <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground px-1.5">
+            <span className="flex items-center gap-1.5 uppercase tracking-wider">
+              <LayoutList className="w-3.5 h-3.5" /> Task
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5" />
+              Created {format(new Date(task.created_at), "MMM d, yyyy")}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" className="size-7 text-muted-foreground" onClick={() => setIsEditDialogOpen(true)} title="Edit Task">
+              <Edit2 className="size-3.5" /><span className="sr-only">Edit Task</span>
+            </Button>
+            <Button variant="ghost" size="icon" className="size-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10" onClick={handleDelete} title="Delete Task">
+              <Trash2 className="size-3.5" /><span className="sr-only">Delete Task</span>
+            </Button>
+            <Button variant="ghost" size="icon" className="size-7 text-muted-foreground" onClick={() => setIsExpanded(!isExpanded)} title={isExpanded ? "Collapse" : "Expand"}>
+              {isExpanded ? <Minimize className="size-3.5" /> : <Maximize className="size-3.5" />}
+              <span className="sr-only">{isExpanded ? "Collapse" : "Expand"}</span>
+            </Button>
+            <DialogClose asChild>
+              <Button variant="ghost" size="icon" className="size-7 text-muted-foreground">
+                <X className="size-3.5" /><span className="sr-only">Close</span>
+              </Button>
+            </DialogClose>
+          </div>
+        </div>
+
+        {/* Two-column layout — takes remaining height */}
+        <div className="flex flex-1 min-h-0 overflow-hidden">
 
           {/* ── Left panel (2/3) ── */}
           <div className="flex flex-col min-w-0 border-r" style={{ flex: '2' }}>
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto px-6 py-8 flex flex-col gap-5">
-              {/* Meta + title */}
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                  <span className="flex items-center gap-1.5 uppercase tracking-wider">
-                    <LayoutList className="w-3.5 h-3.5" /> Task
-                  </span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5" />
-                    Created {format(new Date(task.created_at), "MMM d, yyyy")}
-                  </span>
-                </div>
-                <DialogTitle className="text-2xl font-semibold leading-snug tracking-tight text-foreground">
-                  {task.title}
-                </DialogTitle>
-              </div>
+              {/* Title */}
+              <DialogTitle className="text-2xl font-semibold leading-snug tracking-tight text-foreground">
+                {task.title}
+              </DialogTitle>
 
               {/* Description */}
               <div>

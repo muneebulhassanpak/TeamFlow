@@ -1,59 +1,57 @@
-'use client'
+"use client"
 
-import * as React from 'react'
-import { Loader2, SendHorizonal } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { useCreateComment } from '../hooks/use-comments'
+import * as React from "react"
+import { Loader2, SendHorizonal } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { useCreateComment } from "../hooks/use-comments"
 
 interface CommentInputProps {
   taskId: string
 }
 
 export function CommentInput({ taskId }: CommentInputProps) {
-  const [body, setBody] = React.useState('')
+  const [body, setBody] = React.useState("")
   const create = useCreateComment(taskId)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const trimmed = body.trim()
     if (!trimmed) return
-    create.mutate({ body: trimmed }, { onSuccess: () => setBody('') })
+    create.mutate({ body: trimmed }, { onSuccess: () => setBody("") })
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
       handleSubmit(e as unknown as React.FormEvent)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+    <form onSubmit={handleSubmit} className="flex items-end gap-2">
       <Textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Write a comment… (⌘↵ to submit)"
-        rows={2}
-        className="resize-none text-sm"
+        placeholder="Write a comment… (⌘↵)"
+        rows={1}
+        className="flex-1 resize-none text-sm h-9 py-2 min-h-0"
         disabled={create.isPending}
       />
-      <div className="flex justify-end">
-        <Button
-          type="submit"
-          size="sm"
-          disabled={!body.trim() || create.isPending}
-          className="gap-1.5"
-        >
-          {create.isPending ? (
-            <Loader2 className="size-3.5 animate-spin" />
-          ) : (
-            <SendHorizonal className="size-3.5" />
-          )}
-          Comment
-        </Button>
-      </div>
+      <Button
+        type="submit"
+        size="icon"
+        disabled={!body.trim() || create.isPending}
+        className="shrink-0"
+        title="Submit comment"
+      >
+        {create.isPending ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <SendHorizonal className="size-4" />
+        )}
+      </Button>
     </form>
   )
 }
