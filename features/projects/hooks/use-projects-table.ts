@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { useOrg } from "@/features/app-shell/context/org-context"
 import {
@@ -9,12 +10,19 @@ import {
 
 export function useProjectsTable() {
   const { org, role } = useOrg()
+  const router = useRouter()
   const isAdmin = role === "admin"
   
   const deleteProjectMutation = useDeleteProject(org.id)
   const updateProjectMutation = useUpdateProject(org.id)
 
   const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null)
+  const [navigatingProjectId, setNavigatingProjectId] = useState<string | null>(null)
+
+  function handleProjectClick(projectId: string) {
+    setNavigatingProjectId(projectId)
+    router.push(`/${org.slug}/projects/${projectId}`)
+  }
 
   const handleArchive = async (project: ProjectRow) => {
     try {
@@ -49,5 +57,7 @@ export function useProjectsTable() {
     isDeleting: deleteProjectMutation.isPending,
     handleArchive,
     handleDelete,
+    navigatingProjectId,
+    handleProjectClick,
   }
 }

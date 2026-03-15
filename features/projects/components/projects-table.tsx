@@ -81,6 +81,8 @@ export function ProjectsTable({
     isDeleting,
     handleArchive,
     handleDelete,
+    navigatingProjectId,
+    handleProjectClick,
   } = useProjectsTable()
 
   const pageCount = Math.ceil(total / pageSize)
@@ -150,12 +152,16 @@ export function ProjectsTable({
                         style={{ backgroundColor: project.color }}
                       />
                       <div className="flex flex-col">
-                        <Link
-                          href={`/${org.slug}/projects/${project.id}`}
-                          className="font-medium hover:underline"
+                        <button
+                          onClick={() => handleProjectClick(project.id)}
+                          className="flex items-center gap-1.5 text-left font-medium hover:underline disabled:opacity-60"
+                          disabled={!!navigatingProjectId}
                         >
+                          {navigatingProjectId === project.id && (
+                            <Loader2 className="size-3.5 animate-spin text-muted-foreground" />
+                          )}
                           {project.name}
-                        </Link>
+                        </button>
                         {project.archived && (
                           <Badge variant="secondary" className="mt-1 w-fit text-[10px] uppercase leading-none px-1.5 py-0.5">
                             Archived
