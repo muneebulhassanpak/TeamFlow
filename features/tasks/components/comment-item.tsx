@@ -42,7 +42,7 @@ export function CommentItem({
       </div>
 
       {/* Body — indented to align with the name */}
-      <div className="mt-2 pl-9">
+      <div className="mt-1 pl-9">
         <p className="text-sm leading-relaxed text-foreground/80">{comment.body}</p>
       </div>
     </div>
