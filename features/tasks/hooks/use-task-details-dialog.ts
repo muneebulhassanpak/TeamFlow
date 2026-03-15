@@ -14,15 +14,6 @@ export function useTaskDetailsDialog({ task, onOpenChange }: UseTaskDetailsDialo
 
   const { mutateAsync: deleteTask } = useDeleteTask(task?.project_id || "")
 
-  const initials = task?.assignee?.full_name
-    ? task.assignee.full_name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : task?.assignee?.email.charAt(0).toUpperCase() ?? "?"
-
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this task? This action cannot be undone.")) {
       return
@@ -40,7 +31,6 @@ export function useTaskDetailsDialog({ task, onOpenChange }: UseTaskDetailsDialo
   return {
     isExpanded,
     setIsExpanded,
-    initials,
     handleDelete,
   }
 }
