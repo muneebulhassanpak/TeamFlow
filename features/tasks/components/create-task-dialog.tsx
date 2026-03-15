@@ -1,15 +1,11 @@
 "use client"
 
-import { Plus } from "lucide-react"
-import { Loader2 } from "lucide-react"
-
+import { Plus, Loader2 } from "lucide-react"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
   DialogTitle,
+  DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -18,7 +14,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -30,7 +25,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
+import { DatePicker } from "@/components/shared/date-picker"
+import { cn } from "@/lib/utils"
+import { priorityConfig } from "../utils"
 import { useCreateTaskDialog } from "../hooks/use-create-task-dialog"
 
 interface CreateTaskDialogProps {
@@ -47,6 +44,7 @@ export function CreateTaskDialog({ projectId, children, defaultStatus }: CreateT
     members,
     isLoadingMembers,
     isSubmitting,
+    priority,
     onSubmit,
   } = useCreateTaskDialog({ projectId, defaultStatus })
 
@@ -60,40 +58,114 @@ export function CreateTaskDialog({ projectId, children, defaultStatus }: CreateT
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-125">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <DialogHeader>
-              <DialogTitle>Create Task</DialogTitle>
-              <DialogDescription>
-                Add a new task to your project&apos;s board.
-              </DialogDescription>
-            </DialogHeader>
 
+      <DialogContent className="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-150 [&>button:last-child]:hidden">
+        <DialogTitle className="sr-only">Create Task</DialogTitle>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5 px-6 py-5">
+
+            {/* Title */}
             <FormField
               control={form.control as any} // eslint-disable-line @typescript-eslint/no-explicit-any
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Design Landing Page" {...field} />
+                    <Input
+                      autoFocus
+                      placeholder="Task title…"
+                      {...field}
+                      className="h-auto rounded-md border-none bg-muted/50 px-2 py-1 text-2xl font-bold leading-snug tracking-tight shadow-none focus-visible:ring-0"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* Properties grid */}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Status</span>
+                <Select
+                  value={form.watch("status") ?? "todo"}
+                  onValueChange={(v) => form.setValue("status", v as "todo" | "in_progress" | "in_review" | "done")}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todo">To Do</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="in_review">In Review</SelectItem>
+                    <SelectItem value="done">Done</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Priority</span>
+                <Select
+                  value={priority}
+                  onValueChange={(v) => form.setValue("priority", v as "low" | "medium" | "high" | "urgent")}
+                >
+                  <SelectTrigger className={cn("w-full", priorityConfig[priority].color)}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Due Date</span>
+                <DatePicker
+                  value={form.watch("due_date") ? new Date(form.watch("due_date")!) : undefined}
+                  onChange={(d) => form.setValue("due_date", d ? d.toISOString().split("T")[0] : null)}
+                  placeholder="No due date"
+                  className="font-normal"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Assignee</span>
+                <Select
+                  value={form.watch("assignee_id") ?? "unassigned"}
+                  onValueChange={(v) => form.setValue("assignee_id", v === "unassigned" ? null : v)}
+                  disabled={isLoadingMembers}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Unassigned" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
+                    {members?.map((m) => (
+                      <SelectItem key={m.user_id} value={m.user_id}>
+                        {m.full_name || m.email}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="border-t" />
+
+            {/* Description */}
             <FormField
               control={form.control as any} // eslint-disable-line @typescript-eslint/no-explicit-any
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Add any extra details here..."
-                      className="resize-none"
+                      placeholder="Add a description…"
+                      className="min-h-20 resize-none rounded-md border-none bg-muted/50 px-2 py-1.5 text-sm shadow-none focus-visible:ring-0"
                       {...field}
                       value={field.value ?? ""}
                     />
@@ -103,103 +175,7 @@ export function CreateTaskDialog({ projectId, children, defaultStatus }: CreateT
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control as any} // eslint-disable-line @typescript-eslint/no-explicit-any
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="todo">To Do</SelectItem>
-                        <SelectItem value="in_progress">In Progress</SelectItem>
-                        <SelectItem value="in_review">In Review</SelectItem>
-                        <SelectItem value="done">Done</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control as any} // eslint-disable-line @typescript-eslint/no-explicit-any
-                name="priority"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Priority</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select priority" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="urgent">Urgent</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control as any} // eslint-disable-line @typescript-eslint/no-explicit-any
-                name="assignee_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Assignee</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value ?? undefined}
-                      disabled={isLoadingMembers}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Unassigned" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="unassigned">Unassigned</SelectItem>
-                        {members?.map((member) => (
-                          <SelectItem key={member.user_id} value={member.user_id}>
-                            {member.full_name || member.email}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control as any} // eslint-disable-line @typescript-eslint/no-explicit-any
-                name="due_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Due Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} value={field.value ?? ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <DialogFooter className="pt-4">
+            <DialogFooter>
               <Button
                 type="button"
                 variant="outline"
@@ -209,12 +185,11 @@ export function CreateTaskDialog({ projectId, children, defaultStatus }: CreateT
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && (
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                )}
+                {isSubmitting && <Loader2 className="mr-2 size-4 animate-spin" />}
                 Create Task
               </Button>
             </DialogFooter>
+
           </form>
         </Form>
       </DialogContent>

@@ -36,6 +36,7 @@ export function useCreateTaskDialog({ projectId, defaultStatus }: UseCreateTaskD
   })
 
   const isSubmitting = form.formState.isSubmitting
+  const priority = (form.watch("priority") ?? "medium") as "low" | "medium" | "high" | "urgent"
 
   async function onSubmit(data: CreateTaskFormValues) {
     const payload = {
@@ -63,6 +64,7 @@ export function useCreateTaskDialog({ projectId, defaultStatus }: UseCreateTaskD
     members,
     isLoadingMembers,
     isSubmitting,
+    priority,
     onSubmit,
   }
 }
