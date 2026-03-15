@@ -5,7 +5,6 @@ import { KanbanCard } from "./kanban-card"
 import { TaskRow } from "../hooks/use-tasks"
 import { useKanbanColumn } from "../hooks/use-kanban-column"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { CreateTaskDialog } from "./create-task-dialog"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -15,14 +14,15 @@ interface KanbanColumnProps {
   title: string
   tasks: TaskRow[]
   onTaskClick?: (task: TaskRow) => void
+  onCreateTask?: (status: TaskRow["status"]) => void
 }
 
 export function KanbanColumn({
-  projectId,
   id,
   title,
   tasks,
   onTaskClick,
+  onCreateTask,
 }: KanbanColumnProps) {
   const { taskIds, setNodeRef, isOver } = useKanbanColumn(id, tasks)
 
@@ -34,15 +34,14 @@ export function KanbanColumn({
           <span className="flex size-5 items-center justify-center rounded-full bg-muted-foreground/20 text-xs font-medium text-foreground">
             {tasks.length}
           </span>
-          <CreateTaskDialog projectId={projectId} defaultStatus={id}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 rounded-full text-muted-foreground hover:bg-muted-foreground/20"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </CreateTaskDialog>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 rounded-full text-muted-foreground hover:bg-muted-foreground/20"
+            onClick={() => onCreateTask?.(id)}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 

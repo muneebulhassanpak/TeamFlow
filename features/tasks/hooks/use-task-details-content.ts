@@ -5,12 +5,12 @@ import { toast } from 'sonner'
 import { useUpdateTask, TaskRow } from './use-tasks'
 import { useProjectMembers } from '@/features/projects/hooks/use-projects'
 
-export function useTaskDetailsContent(task: TaskRow | null) {
+export function useTaskDetailsContent(task: TaskRow | null, autoFocusTitle = false) {
   const update = useUpdateTask(task?.project_id ?? '')
   const { data: members } = useProjectMembers(task?.project_id ?? '')
 
   // ── Inline edit state ──────────────────────────────────────────────────────
-  const [editingTitle, setEditingTitle] = React.useState(false)
+  const [editingTitle, setEditingTitle] = React.useState(autoFocusTitle)
   const [titleValue, setTitleValue] = React.useState(task?.title ?? '')
 
   const [editingDesc, setEditingDesc] = React.useState(false)

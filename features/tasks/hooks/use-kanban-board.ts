@@ -21,11 +21,6 @@ interface UseKanbanBoardOptions {
 export function useKanbanBoard({ tasks: initialTasks, onReorder }: UseKanbanBoardOptions) {
   const [tasks, setTasks] = useState<TaskRow[]>(initialTasks)
   const [activeId, setActiveId] = useState<string | null>(null)
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
-
-  // Derive from live tasks array so dialog always reflects cache updates
-  const selectedTask = selectedTaskId ? (tasks.find((t) => t.id === selectedTaskId) ?? null) : null
-  const setSelectedTask = (task: TaskRow | null) => setSelectedTaskId(task?.id ?? null)
 
   useEffect(() => {
     const sorted = [...initialTasks].sort((a, b) => a.position - b.position)
@@ -135,8 +130,6 @@ export function useKanbanBoard({ tasks: initialTasks, onReorder }: UseKanbanBoar
     tasks,
     activeId,
     activeTask,
-    selectedTask,
-    setSelectedTask,
     sensors,
     handleDragStart,
     handleDragOver,

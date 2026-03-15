@@ -1,10 +1,10 @@
 "use client"
 
-import { useTaskRealtime, useTasks, useReorderTasks } from "@/features/tasks/hooks/use-tasks"
 import { KanbanBoard } from "@/features/tasks/components/kanban-board"
 import { TaskFilters } from "@/features/tasks/components/task-filters"
-import { CreateTaskDialog } from "@/features/tasks/components/create-task-dialog"
-import { FolderOpen } from "lucide-react"
+import { TaskDetailsDialog } from "@/features/tasks/components/task-details-dialog"
+import { Button } from "@/components/ui/button"
+import { Plus, FolderOpen } from "lucide-react"
 import {
   Empty,
   EmptyDescription,
@@ -13,7 +13,8 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useQueryState, parseAsString } from "nuqs"
+import { useProjectBoardView } from "../hooks/use-project-board-view"
+import { TaskRow } from "@/features/tasks/hooks/use-tasks"
 
 interface ProjectBoardViewProps {
   projectId: string
@@ -23,19 +24,17 @@ interface ProjectBoardViewProps {
 }
 
 export function ProjectBoardView({ projectId, projectName, currentUserId, currentUserRole }: ProjectBoardViewProps) {
-  useTaskRealtime(projectId)
-
-  const [search] = useQueryState("search", parseAsString.withDefault(""))
-  const [priority] = useQueryState("priority", parseAsString.withDefault(""))
-  const [assigneeId] = useQueryState("assigneeId", parseAsString.withDefault(""))
-
   const {
-    data: tasks = [],
+    tasks,
     isLoading,
     error,
-  } = useTasks(projectId, { search, priority, assigneeId })
-
-  const { mutate: reorderTasks } = useReorderTasks(projectId)
+    reorderTasks,
+    freshSelectedTask,
+    setSelectedTask,
+    isNewTask,
+    handleCreateTask,
+    handleCloseDialog,
+  } = useProjectBoardView({ projectId })
 
   if (error) {
     return (
@@ -64,7 +63,10 @@ export function ProjectBoardView({ projectId, projectName, currentUserId, curren
       {/* Filters Row */}
       <div className="flex items-center justify-between">
         <TaskFilters projectId={projectId} />
-        <CreateTaskDialog projectId={projectId} />
+        <Button onClick={() => handleCreateTask("todo")}>
+          <Plus className="size-4" />
+          New Task
+        </Button>
       </div>
 
       {/* Board Area */}
@@ -97,14 +99,28 @@ export function ProjectBoardView({ projectId, projectName, currentUserId, curren
           <KanbanBoard
             projectId={projectId}
             tasks={tasks}
-            onReorder={(tasks) => reorderTasks({
-              tasks: tasks.map(t => ({ id: t.id, status: t.status, position: t.position }))
-            })}
+            onReorder={(reorderableTasks) =>
+              reorderTasks({
+                tasks: reorderableTasks.map((t) => ({ id: t.id, status: t.status, position: t.position })),
+              })
+            }
+            onTaskClick={(task: TaskRow) => setSelectedTask(task)}
+            onCreateTask={handleCreateTask}
             currentUserId={currentUserId}
             currentUserRole={currentUserRole}
           />
         )}
       </div>
+
+      <TaskDetailsDialog
+        key={freshSelectedTask?.id}
+        task={freshSelectedTask}
+        open={!!freshSelectedTask}
+        onOpenChange={(open) => !open && handleCloseDialog()}
+        autoFocusTitle={isNewTask}
+        currentUserId={currentUserId}
+        currentUserRole={currentUserRole}
+      />
     </div>
   )
 }

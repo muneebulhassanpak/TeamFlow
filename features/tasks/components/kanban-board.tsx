@@ -8,7 +8,6 @@ import {
   defaultDropAnimationSideEffects,
 } from "@dnd-kit/core"
 import { KanbanCard } from "./kanban-card"
-import { TaskDetailsDialog } from "./task-details-dialog"
 import { TaskRow } from "../hooks/use-tasks"
 import { useKanbanBoard } from "../hooks/use-kanban-board"
 
@@ -25,16 +24,22 @@ interface KanbanBoardProps {
   projectId: string
   tasks: TaskRow[]
   onReorder: (tasks: TaskRow[]) => void
+  onTaskClick: (task: TaskRow) => void
+  onCreateTask: (status: TaskRow["status"]) => void
   currentUserId: string
   currentUserRole: string
 }
 
-export function KanbanBoard({ projectId, tasks: initialTasks, onReorder, currentUserId, currentUserRole }: KanbanBoardProps) {
+export function KanbanBoard({
+  projectId,
+  tasks: initialTasks,
+  onReorder,
+  onTaskClick,
+  onCreateTask,
+}: KanbanBoardProps) {
   const {
     tasks,
     activeTask,
-    selectedTask,
-    setSelectedTask,
     sensors,
     handleDragStart,
     handleDragOver,
@@ -57,7 +62,8 @@ export function KanbanBoard({ projectId, tasks: initialTasks, onReorder, current
             id={col.id}
             title={col.title}
             tasks={tasks.filter((t) => t.status === col.id)}
-            onTaskClick={setSelectedTask}
+            onTaskClick={onTaskClick}
+            onCreateTask={onCreateTask}
           />
         ))}
       </div>
@@ -71,14 +77,6 @@ export function KanbanBoard({ projectId, tasks: initialTasks, onReorder, current
       >
         {activeTask ? <KanbanCard task={activeTask} /> : null}
       </DragOverlay>
-
-      <TaskDetailsDialog
-        task={selectedTask}
-        open={!!selectedTask}
-        onOpenChange={(open) => !open && setSelectedTask(null)}
-        currentUserId={currentUserId}
-        currentUserRole={currentUserRole}
-      />
     </DndContext>
   )
 }

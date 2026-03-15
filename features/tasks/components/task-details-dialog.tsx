@@ -34,6 +34,7 @@ interface TaskDetailsDialogProps {
   task: TaskRow | null
   open: boolean
   onOpenChange: (open: boolean) => void
+  autoFocusTitle?: boolean
   currentUserId: string
   currentUserRole: string
 }
@@ -42,6 +43,7 @@ export function TaskDetailsDialog({
   task,
   open,
   onOpenChange,
+  autoFocusTitle = false,
   currentUserId,
   currentUserRole,
 }: TaskDetailsDialogProps) {
@@ -64,7 +66,7 @@ export function TaskDetailsDialog({
     saveDesc,
     cancelDesc,
     updateField,
-  } = useTaskDetailsContent(task)
+  } = useTaskDetailsContent(task, autoFocusTitle)
 
   if (!task) return null
 
@@ -125,6 +127,7 @@ export function TaskDetailsDialog({
                   autoFocus
                   value={titleValue}
                   onChange={(e) => setTitleValue(e.target.value)}
+                  onFocus={(e) => e.target.select()}
                   onBlur={saveTitle}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") { e.preventDefault(); saveTitle() }
