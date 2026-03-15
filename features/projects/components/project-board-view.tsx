@@ -56,18 +56,12 @@ export function ProjectBoardView({ projectId, projectName, currentUserId, curren
 
   return (
     <div className="flex h-full flex-col gap-6">
-      {/* Header Row */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">{projectName}</h1>
-          <p className="text-sm text-muted-foreground">Manage tasks for this project</p>
-        </div>
-      </div>
-
-      {/* Filters Row */}
-      <div className="flex items-center justify-between">
+      {/* Title + Filters + Action — single row */}
+      <div className="flex items-center gap-4">
+        <h1 className="shrink-0 text-lg font-semibold">{projectName}</h1>
+        <div className="h-4 w-px bg-border" />
         <TaskFilters projectId={projectId} />
-        <Button onClick={() => handleCreateTask("todo")}>
+        <Button className="ml-auto shrink-0" onClick={() => handleCreateTask("todo")}>
           <Plus className="size-4" />
           New Task
         </Button>
