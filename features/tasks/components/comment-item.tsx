@@ -1,13 +1,13 @@
-'use client'
+"use client"
 
-import { Loader2, Pencil, Trash2, X, Check } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Textarea } from '@/components/ui/textarea'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import { useCommentItem } from '../hooks/use-comment-item'
-import { getInitials, formatRelativeTime } from '../utils'
-import type { TaskCommentWithAuthor } from '@/types'
+import { Loader2, Pencil, Trash2, X, Check } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { useCommentItem } from "../hooks/use-comment-item"
+import { getInitials, formatRelativeTime } from "../utils"
+import type { TaskCommentWithAuthor } from "@/types"
 
 interface CommentItemProps {
   comment: TaskCommentWithAuthor
@@ -16,7 +16,12 @@ interface CommentItemProps {
   currentUserRole: string
 }
 
-export function CommentItem({ comment, taskId, currentUserId, currentUserRole }: CommentItemProps) {
+export function CommentItem({
+  comment,
+  taskId,
+  currentUserId,
+  currentUserRole,
+}: CommentItemProps) {
   const {
     editing,
     setEditing,
@@ -35,15 +40,21 @@ export function CommentItem({ comment, taskId, currentUserId, currentUserRole }:
     <div className="flex gap-3">
       <Avatar className="size-7 shrink-0">
         <AvatarImage src={comment.author.avatar_url ?? undefined} />
-        <AvatarFallback className="text-xs">{getInitials(comment.author.full_name)}</AvatarFallback>
+        <AvatarFallback className="text-xs">
+          {getInitials(comment.author.full_name)}
+        </AvatarFallback>
       </Avatar>
 
       <div className="group min-w-0 flex-1">
         <div className="flex items-baseline gap-2">
-          <span className="text-sm font-medium">{comment.author.full_name ?? 'Unknown'}</span>
-          <span className="text-muted-foreground text-xs">{formatRelativeTime(comment.created_at)}</span>
+          <span className="text-xs font-medium">
+            {comment.author.full_name ?? "Unknown"}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {formatRelativeTime(comment.created_at)}
+          </span>
           {comment.edited_at && (
-            <span className="text-muted-foreground text-xs">(edited)</span>
+            <span className="text-xs text-muted-foreground">(edited)</span>
           )}
         </div>
 
@@ -57,17 +68,32 @@ export function CommentItem({ comment, taskId, currentUserId, currentUserRole }:
               autoFocus
             />
             <div className="flex gap-1.5">
-              <Button size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs" onClick={handleSaveEdit} disabled={isUpdating}>
-                {isUpdating ? <Loader2 className="size-3 animate-spin" /> : <Check className="size-3" />}
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 gap-1 px-2 text-xs"
+                onClick={handleSaveEdit}
+                disabled={isUpdating}
+              >
+                {isUpdating ? (
+                  <Loader2 className="size-3 animate-spin" />
+                ) : (
+                  <Check className="size-3" />
+                )}
                 Save
               </Button>
-              <Button size="sm" variant="ghost" className="h-7 gap-1 px-2 text-xs" onClick={handleCancelEdit}>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 gap-1 px-2 text-xs"
+                onClick={handleCancelEdit}
+              >
                 <X className="size-3" /> Cancel
               </Button>
             </div>
           </div>
         ) : (
-          <p className={cn('mt-0.5 text-sm', isDeleting && 'opacity-50')}>
+          <p className={cn("mt-0.5 text-sm", isDeleting && "opacity-50")}>
             {comment.body}
           </p>
         )}
@@ -78,7 +104,7 @@ export function CommentItem({ comment, taskId, currentUserId, currentUserRole }:
           {canEdit && (
             <button
               onClick={() => setEditing(true)}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="text-muted-foreground transition-colors hover:text-foreground"
               aria-label="Edit comment"
             >
               <Pencil className="size-3.5" />
@@ -87,7 +113,7 @@ export function CommentItem({ comment, taskId, currentUserId, currentUserRole }:
           {canDelete && (
             <button
               onClick={handleDelete}
-              className="text-muted-foreground hover:text-destructive transition-colors"
+              className="text-muted-foreground transition-colors hover:text-destructive"
               aria-label="Delete comment"
               disabled={isDeleting}
             >
