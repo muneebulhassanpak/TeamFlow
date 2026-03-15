@@ -27,7 +27,7 @@ export function KanbanColumn({
   const { taskIds, setNodeRef, isOver } = useKanbanColumn(id, tasks)
 
   return (
-    <div className="flex h-[calc(100vh-14rem)] w-72 shrink-0 flex-col">
+    <div className="flex h-[calc(100vh-14rem)] min-w-56 flex-1 flex-col">
       {/* Column header */}
       <div className="flex items-center justify-between px-1 py-3">
         <div className="flex items-center gap-2">

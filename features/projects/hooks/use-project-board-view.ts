@@ -1,14 +1,23 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { parseAsString, useQueryState } from "nuqs"
 import { TaskRow, useCreateTask, useReorderTasks, useTaskRealtime, useTasks } from "@/features/tasks/hooks/use-tasks"
+import { useSetNavTitle } from "@/features/app-shell/context/nav-title-context"
 
 interface UseProjectBoardViewOptions {
   projectId: string
+  projectName: string
 }
 
-export function useProjectBoardView({ projectId }: UseProjectBoardViewOptions) {
+export function useProjectBoardView({ projectId, projectName }: UseProjectBoardViewOptions) {
+  const setNavTitle = useSetNavTitle()
+
+  useEffect(() => {
+    setNavTitle(projectName)
+    return () => setNavTitle(null)
+  }, [projectName, setNavTitle])
+
   useTaskRealtime(projectId)
 
   const [search] = useQueryState("search", parseAsString.withDefault(""))

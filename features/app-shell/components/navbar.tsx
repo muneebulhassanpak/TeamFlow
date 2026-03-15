@@ -17,6 +17,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { useOrg } from '@/features/app-shell/context/org-context'
+import { useNavTitle } from '@/features/app-shell/context/nav-title-context'
 import { NotificationBell } from '@/features/notifications/components/notification-bell'
 import { useSignout } from '@/features/auth/hooks/use-auth'
 
@@ -34,16 +35,30 @@ const SEGMENT_LABELS: Record<string, string> = {
   settings: 'Settings',
 }
 
-function useBreadcrumb() {
+type BreadcrumbEntry = { label: string; href?: string }
+
+function useBreadcrumbItems(orgSlug: string, navTitle: string | null): BreadcrumbEntry[] {
   const pathname = usePathname()
   const parts = pathname.split('/').filter(Boolean)
+  // parts[0] = orgSlug, parts[1] = segment, parts[2] = id (optional)
+
   const segment = parts[1] ?? 'dashboard'
-  return SEGMENT_LABELS[segment] ?? segment
+  const hasDetailPage = !!parts[2]
+
+  if (segment === 'projects' && hasDetailPage) {
+    return [
+      { label: SEGMENT_LABELS.projects, href: `/${orgSlug}/projects` },
+      { label: navTitle ?? 'Project' },
+    ]
+  }
+
+  return [{ label: SEGMENT_LABELS[segment] ?? segment }]
 }
 
 export function Navbar({ userId }: NavbarProps) {
   const { org } = useOrg()
-  const currentPage = useBreadcrumb()
+  const navTitle = useNavTitle()
+  const breadcrumbItems = useBreadcrumbItems(org.slug, navTitle)
   const signout = useSignout()
   const { theme, setTheme } = useTheme()
 
@@ -51,22 +66,28 @@ export function Navbar({ userId }: NavbarProps) {
     <header className="flex h-14 shrink-0 items-center gap-2 px-4">
       <SidebarTrigger className="-ml-1" />
       <Separator orientation="vertical" className="mr-1 data-[orientation=vertical]:h-4" />
+
       <Breadcrumb>
         <BreadcrumbList>
+          {/* Org — always the root */}
           <BreadcrumbItem className="hidden md:block">
             <BreadcrumbLink href={`/${org.slug}/dashboard`}>{org.name}</BreadcrumbLink>
           </BreadcrumbItem>
-          <BreadcrumbSeparator className="hidden md:block" />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{currentPage}</BreadcrumbPage>
-          </BreadcrumbItem>
+
+          {breadcrumbItems.map((item, i) => (
+            <React.Fragment key={i}>
+              <BreadcrumbSeparator className={i === 0 ? 'hidden md:block' : undefined} />
+              <BreadcrumbItem>
+                {item.href ? (
+                  <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
+                ) : (
+                  <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                )}
+              </BreadcrumbItem>
+            </React.Fragment>
+          ))}
         </BreadcrumbList>
       </Breadcrumb>
-
-      <Separator orientation="vertical" className="mx-1 hidden data-[orientation=vertical]:h-4 sm:block" />
-      <span className="text-foreground/70 hidden text-xs font-medium sm:block">
-        {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-      </span>
 
       <div className="flex-1" />
 

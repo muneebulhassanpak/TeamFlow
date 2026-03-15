@@ -38,7 +38,7 @@ export function ProjectBoardView({ projectId, projectName, currentUserId, curren
     handleQuickSubmit,
     handleQuickCancel,
     handleCloseDialog,
-  } = useProjectBoardView({ projectId })
+  } = useProjectBoardView({ projectId, projectName })
 
   if (error) {
     return (
@@ -56,10 +56,8 @@ export function ProjectBoardView({ projectId, projectName, currentUserId, curren
 
   return (
     <div className="flex h-full flex-col gap-6">
-      {/* Title + Filters + Action — single row */}
+      {/* Filters + Action */}
       <div className="flex items-center gap-4">
-        <h1 className="shrink-0 text-lg font-semibold">{projectName}</h1>
-        <div className="h-4 w-px bg-border" />
         <TaskFilters projectId={projectId} />
         <Button className="ml-auto shrink-0" onClick={() => handleCreateTask("todo")}>
           <Plus className="size-4" />

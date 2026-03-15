@@ -1,8 +1,8 @@
-'use client'
+"use client"
 
-import * as React from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import * as React from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   FolderKanban,
@@ -10,9 +10,8 @@ import {
   Users,
   Activity,
   Settings,
-  ChevronsUpDown,
   LogOut,
-} from 'lucide-react'
+} from "lucide-react"
 
 import {
   Sidebar,
@@ -25,8 +24,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
-} from '@/components/ui/sidebar'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+} from "@/components/ui/sidebar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,16 +33,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { useOrg } from '@/features/app-shell/context/org-context'
-import { useSignout } from '@/features/auth/hooks/use-auth'
+} from "@/components/ui/dropdown-menu"
+import { useOrg } from "@/features/app-shell/context/org-context"
+import { useSignout } from "@/features/auth/hooks/use-auth"
 
 const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard, segment: 'dashboard' },
-  { label: 'Projects', icon: FolderKanban, segment: 'projects' },
-  { label: 'My Tasks', icon: CheckSquare, segment: 'my-tasks' },
-  { label: 'Members', icon: Users, segment: 'members' },
-  { label: 'Activity', icon: Activity, segment: 'activity' },
+  { label: "Dashboard", icon: LayoutDashboard, segment: "dashboard" },
+  { label: "Projects", icon: FolderKanban, segment: "projects" },
+  { label: "My Tasks", icon: CheckSquare, segment: "my-tasks" },
+  { label: "Members", icon: Users, segment: "members" },
+  { label: "Activity", icon: Activity, segment: "activity" },
 ]
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
@@ -54,14 +53,20 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 
 function getUserInitials(name: string | null, email: string) {
   if (name) {
-    const parts = name.trim().split(' ')
-    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    const parts = name.trim().split(" ")
+    if (parts.length >= 2)
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
     return parts[0].slice(0, 2).toUpperCase()
   }
   return email.slice(0, 2).toUpperCase()
 }
 
-export function AppSidebar({ userEmail, userFullName, userAvatarUrl, ...props }: AppSidebarProps) {
+export function AppSidebar({
+  userEmail,
+  userFullName,
+  userAvatarUrl,
+  ...props
+}: AppSidebarProps) {
   const { org } = useOrg()
   const pathname = usePathname()
   const signout = useSignout()
@@ -69,7 +74,7 @@ export function AppSidebar({ userEmail, userFullName, userAvatarUrl, ...props }:
 
   function isActive(segment: string) {
     const href = `${base}/${segment}`
-    return pathname === href || pathname.startsWith(href + '/')
+    return pathname === href || pathname.startsWith(href + "/")
   }
 
   const orgInitials = org.name.slice(0, 2).toUpperCase()
@@ -83,7 +88,7 @@ export function AppSidebar({ userEmail, userFullName, userAvatarUrl, ...props }:
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href={`${base}/dashboard`}>
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg text-xs font-bold">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-xs font-bold text-sidebar-primary-foreground">
                   {orgInitials}
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
@@ -124,23 +129,43 @@ export function AppSidebar({ userEmail, userFullName, userAvatarUrl, ...props }:
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent">
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent"
+                >
                   <Avatar className="size-8 rounded-lg">
-                    {userAvatarUrl && <AvatarImage src={userAvatarUrl} alt={userFullName ?? userEmail} />}
-                    <AvatarFallback className="rounded-lg text-xs">{userInitials}</AvatarFallback>
+                    {userAvatarUrl && (
+                      <AvatarImage
+                        src={userAvatarUrl}
+                        alt={userFullName ?? userEmail}
+                      />
+                    )}
+                    <AvatarFallback className="rounded-lg text-xs">
+                      {userInitials}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="flex min-w-0 flex-col gap-0.5 leading-none">
-                    {userFullName && <span className="truncate text-sm font-semibold">{userFullName}</span>}
-                    <span className="text-muted-foreground truncate text-xs">{userEmail}</span>
+                    {userFullName && (
+                      <span className="truncate text-sm font-semibold">
+                        {userFullName}
+                      </span>
+                    )}
+                    <span className="truncate text-xs text-muted-foreground">
+                      {userEmail}
+                    </span>
                   </div>
-                  <ChevronsUpDown className="ml-auto size-4 shrink-0" />
+                  <Settings className="ml-auto size-4 shrink-0 text-muted-foreground" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="w-56">
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col gap-0.5">
-                    {userFullName && <p className="text-sm font-medium">{userFullName}</p>}
-                    <p className="text-muted-foreground truncate text-xs">{userEmail}</p>
+                    {userFullName && (
+                      <p className="text-sm font-medium">{userFullName}</p>
+                    )}
+                    <p className="truncate text-xs text-muted-foreground">
+                      {userEmail}
+                    </p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
