@@ -133,8 +133,12 @@ export function useUpdateTask(projectId: string) {
         queryClient.setQueryData(key, data)
       })
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks", projectId] })
+    onSuccess: (result: { data: TaskRow }, { taskId }) => {
+      const updated = result.data
+      queryClient.setQueriesData<TaskRow[]>(
+        { queryKey: ["tasks", projectId] },
+        (old) => old?.map((t) => (t.id === taskId ? updated : t)) ?? old
+      )
     },
   })
 }
