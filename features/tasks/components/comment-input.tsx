@@ -15,25 +15,27 @@ export function CommentInput({ taskId }: CommentInputProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-center gap-2 rounded-xl border bg-background px-3 py-2 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0"
+      className="rounded-xl border bg-background focus-within:ring-2 focus-within:ring-ring"
     >
       <Textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Write a comment… (⌘↵)"
-        rows={1}
-        className="flex-1 resize-none border-0 bg-transparent p-0 text-sm shadow-none outline-none focus-visible:ring-0 min-h-0 h-6 leading-6"
+        placeholder="Type a comment… (⌘↵)"
+        rows={2}
+        className="resize-none border-0 bg-transparent px-3 pt-3 pb-1 text-sm shadow-none focus-visible:ring-0"
       />
-      <Button
-        type="submit"
-        size="icon"
-        disabled={!body.trim()}
-        className="size-8 shrink-0 rounded-lg"
-        title="Submit comment"
-      >
-        <SendHorizonal className="size-4" />
-      </Button>
+      <div className="flex justify-end px-2 pb-2">
+        <Button
+          type="submit"
+          size="icon"
+          disabled={!body.trim()}
+          className="size-7 rounded-lg"
+          title="Submit comment"
+        >
+          <SendHorizonal className="size-3.5" />
+        </Button>
+      </div>
     </form>
   )
 }
