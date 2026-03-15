@@ -11,7 +11,6 @@ interface UseTaskDetailsDialogOptions {
 
 export function useTaskDetailsDialog({ task, onOpenChange }: UseTaskDetailsDialogOptions) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   const { mutateAsync: deleteTask } = useDeleteTask(task?.project_id || "")
 
@@ -41,8 +40,6 @@ export function useTaskDetailsDialog({ task, onOpenChange }: UseTaskDetailsDialo
   return {
     isExpanded,
     setIsExpanded,
-    isEditDialogOpen,
-    setIsEditDialogOpen,
     initials,
     handleDelete,
   }

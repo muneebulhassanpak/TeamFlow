@@ -1,7 +1,9 @@
 "use client"
 
+import * as React from "react"
 import { format } from "date-fns"
-import { TaskRow } from "../hooks/use-tasks"
+import { toast } from "sonner"
+import { TaskRow, useUpdateTask } from "../hooks/use-tasks"
 import {
   Dialog,
   DialogContent,
@@ -11,7 +13,16 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   CalendarIcon,
   Clock,
@@ -21,17 +32,16 @@ import {
   LayoutList,
   Maximize,
   Minimize,
-  Edit2,
   Trash2,
   X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { priorityConfig, statusLabels } from "../utils"
+import { priorityConfig } from "../utils"
 import { useTaskDetailsDialog } from "../hooks/use-task-details-dialog"
-import { EditTaskDialog } from "./edit-task-dialog"
 import { SubtaskList } from "./subtask-list"
 import { CommentList } from "./comment-list"
 import { CommentInput } from "./comment-input"
+import { useProjectMembers } from "@/features/projects/hooks/use-projects"
 
 interface TaskDetailsDialogProps {
   task: TaskRow | null
@@ -48,14 +58,88 @@ export function TaskDetailsDialog({
   currentUserId,
   currentUserRole,
 }: TaskDetailsDialogProps) {
-  const {
-    isExpanded,
-    setIsExpanded,
-    isEditDialogOpen,
-    setIsEditDialogOpen,
-    initials,
-    handleDelete,
-  } = useTaskDetailsDialog({ task, onOpenChange })
+  const { isExpanded, setIsExpanded, initials, handleDelete } =
+    useTaskDetailsDialog({ task, onOpenChange })
+
+  const update = useUpdateTask(task?.project_id ?? "")
+  const { data: members } = useProjectMembers(task?.project_id ?? "")
+
+  // ── Inline edit state ──────────────────────────────────────────────────────
+  const [editingTitle, setEditingTitle] = React.useState(false)
+  const [titleValue, setTitleValue] = React.useState(task?.title ?? "")
+
+  const [editingDesc, setEditingDesc] = React.useState(false)
+  const [descValue, setDescValue] = React.useState(task?.description ?? "")
+
+  // Sync local state when task changes from outside (optimistic or refetch)
+  React.useEffect(() => {
+    if (!editingTitle) setTitleValue(task?.title ?? "")
+  }, [task?.title, editingTitle])
+
+  React.useEffect(() => {
+    if (!editingDesc) setDescValue(task?.description ?? "")
+  }, [task?.description, editingDesc])
+
+  // ── Save helpers ───────────────────────────────────────────────────────────
+  function saveTitle() {
+    const trimmed = titleValue.trim()
+    if (!trimmed) {
+      setTitleValue(task!.title)
+      setEditingTitle(false)
+      return
+    }
+    if (trimmed === task!.title) {
+      setEditingTitle(false)
+      return
+    }
+    update.mutate(
+      { taskId: task!.id, title: trimmed },
+      {
+        onSuccess: () => setEditingTitle(false),
+        onError: (err) => {
+          toast.error(err.message || "Failed to update title")
+          setTitleValue(task!.title)
+          setEditingTitle(false)
+        },
+      }
+    )
+  }
+
+  function cancelTitle() {
+    setTitleValue(task!.title)
+    setEditingTitle(false)
+  }
+
+  function saveDesc() {
+    const trimmed = descValue.trim()
+    const current = task!.description ?? ""
+    if (trimmed === current) {
+      setEditingDesc(false)
+      return
+    }
+    update.mutate(
+      { taskId: task!.id, description: trimmed || null },
+      {
+        onSuccess: () => setEditingDesc(false),
+        onError: (err) => {
+          toast.error(err.message || "Failed to update description")
+          setDescValue(current)
+          setEditingDesc(false)
+        },
+      }
+    )
+  }
+
+  function cancelDesc() {
+    setDescValue(task!.description ?? "")
+    setEditingDesc(false)
+  }
+
+  function updateField(patch: Parameters<typeof update.mutate>[0]) {
+    update.mutate(patch, {
+      onError: (err) => toast.error(err.message || "Failed to update task"),
+    })
+  }
 
   if (!task) return null
 
@@ -64,7 +148,7 @@ export function TaskDetailsDialog({
       <DialogContent
         className={cn(
           "flex h-[85vh] flex-col gap-0 overflow-hidden border-muted p-0 transition-all duration-300 [&>button:last-child]:hidden",
-          isExpanded ? "sm:max-w-275" : "sm:max-w-225"
+          isExpanded ? "sm:max-w-[1100px]" : "sm:max-w-[900px]"
         )}
       >
         <div className="sr-only">
@@ -72,10 +156,9 @@ export function TaskDetailsDialog({
         </div>
 
         {/* Shared top bar */}
-        <div className="flex shrink-0 items-center justify-between gap-1 border-b px-3 py-2">
-          {/* Meta: type + date */}
+        <div className="flex shrink-0 items-center justify-between border-b px-3 py-2">
           <div className="flex items-center gap-2 px-1.5 text-xs font-medium text-muted-foreground">
-            <span className="flex items-center gap-1.5 tracking-wider uppercase">
+            <span className="flex items-center gap-1.5 uppercase tracking-wider">
               <LayoutList className="h-3.5 w-3.5" /> Task
             </span>
             <span>•</span>
@@ -85,16 +168,6 @@ export function TaskDetailsDialog({
             </span>
           </div>
           <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-7 text-muted-foreground"
-              onClick={() => setIsEditDialogOpen(true)}
-              title="Edit Task"
-            >
-              <Edit2 className="size-3.5" />
-              <span className="sr-only">Edit Task</span>
-            </Button>
             <Button
               variant="ghost"
               size="icon"
@@ -117,16 +190,10 @@ export function TaskDetailsDialog({
               ) : (
                 <Maximize className="size-3.5" />
               )}
-              <span className="sr-only">
-                {isExpanded ? "Collapse" : "Expand"}
-              </span>
+              <span className="sr-only">{isExpanded ? "Collapse" : "Expand"}</span>
             </Button>
             <DialogClose asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-7 text-muted-foreground"
-              >
+              <Button variant="ghost" size="icon" className="size-7 text-muted-foreground">
                 <X className="size-3.5" />
                 <span className="sr-only">Close</span>
               </Button>
@@ -134,94 +201,182 @@ export function TaskDetailsDialog({
           </div>
         </div>
 
-        {/* Two-column layout — takes remaining height */}
+        {/* Two-column layout */}
         <div className="flex min-h-0 flex-1 overflow-hidden">
-          {/* ── Left panel (2/3) ── */}
+
+          {/* ── Left panel ── */}
           <div className="flex min-w-0 flex-col border-r" style={{ flex: "2" }}>
-            {/* Scrollable content */}
-            <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-6 py-8">
+            <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-6 py-6">
+
               {/* Title */}
-              <DialogTitle className="text-2xl leading-snug font-semibold tracking-tight text-foreground">
-                {task.title}
-              </DialogTitle>
+              {editingTitle ? (
+                <Input
+                  autoFocus
+                  value={titleValue}
+                  onChange={(e) => setTitleValue(e.target.value)}
+                  onBlur={saveTitle}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") { e.preventDefault(); saveTitle() }
+                    if (e.key === "Escape") { e.preventDefault(); cancelTitle() }
+                  }}
+                  className="text-2xl font-semibold h-auto border-none px-0 shadow-none focus-visible:ring-0 leading-snug tracking-tight"
+                  disabled={update.isPending}
+                />
+              ) : (
+                <DialogTitle
+                  onClick={() => setEditingTitle(true)}
+                  className="cursor-text rounded px-0 text-2xl font-semibold leading-snug tracking-tight text-foreground hover:bg-muted/40 transition-colors -mx-1 px-1"
+                >
+                  {task.title}
+                </DialogTitle>
+              )}
 
               {/* Description */}
-              <div>
-                {task.description ? (
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/80">
-                    {task.description}
-                  </p>
-                ) : (
-                  <p className="text-sm text-muted-foreground italic">
-                    No description provided.
-                  </p>
-                )}
-              </div>
+              {editingDesc ? (
+                <Textarea
+                  autoFocus
+                  value={descValue}
+                  onChange={(e) => setDescValue(e.target.value)}
+                  onBlur={saveDesc}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") { e.preventDefault(); cancelDesc() }
+                  }}
+                  placeholder="Add a description…"
+                  className="min-h-[80px] resize-none text-sm border-none px-0 shadow-none focus-visible:ring-0"
+                  disabled={update.isPending}
+                />
+              ) : (
+                <div
+                  onClick={() => setEditingDesc(true)}
+                  className="cursor-text rounded -mx-1 px-1 py-1 hover:bg-muted/40 transition-colors"
+                >
+                  {task.description ? (
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/80">
+                      {task.description}
+                    </p>
+                  ) : (
+                    <p className="text-sm italic text-muted-foreground">
+                      Add a description…
+                    </p>
+                  )}
+                </div>
+              )}
 
               {/* Subtasks */}
               <SubtaskList taskId={task.id} />
             </div>
 
             {/* Properties footer */}
-            <div className="flex shrink-0 flex-wrap items-center gap-6 border-t bg-muted/30 px-6 py-4">
-              <div className="flex items-center gap-2.5">
-                <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">
-                  {statusLabels[task.status]}
-                </span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Flag className="h-4 w-4 text-muted-foreground" />
-                <Badge
-                  variant="outline"
-                  className={`font-normal ${priorityConfig[task.priority].color}`}
+            <div className="flex shrink-0 flex-wrap items-center gap-4 border-t bg-muted/30 px-6 py-3">
+
+              {/* Status */}
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <Select
+                  value={task.status}
+                  onValueChange={(v) =>
+                    updateField({ taskId: task.id, status: v as TaskRow["status"] })
+                  }
                 >
-                  {priorityConfig[task.priority].label}
-                </Badge>
+                  <SelectTrigger className="h-auto border-none bg-transparent p-0 text-sm font-medium shadow-none focus:ring-0 [&>svg]:ml-1 [&>svg]:opacity-50">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todo">To Do</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="in_review">In Review</SelectItem>
+                    <SelectItem value="done">Done</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="flex items-center gap-2.5">
-                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">
-                  {task.due_date ? (
-                    format(new Date(task.due_date), "MMM d, yyyy")
-                  ) : (
-                    <span className="font-normal text-muted-foreground">
-                      No due date
-                    </span>
-                  )}
-                </span>
+
+              {/* Priority */}
+              <div className="flex items-center gap-2">
+                <Flag className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <Select
+                  value={task.priority}
+                  onValueChange={(v) =>
+                    updateField({ taskId: task.id, priority: v as TaskRow["priority"] })
+                  }
+                >
+                  <SelectTrigger className="h-auto border-none bg-transparent p-0 shadow-none focus:ring-0 [&>svg]:ml-1 [&>svg]:opacity-50">
+                    <Badge
+                      variant="outline"
+                      className={cn("font-normal pointer-events-none", priorityConfig[task.priority].color)}
+                    >
+                      {priorityConfig[task.priority].label}
+                    </Badge>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="ml-auto flex items-center gap-2.5">
-                <User className="h-4 w-4 text-muted-foreground" />
-                {task.assignee ? (
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-5 w-5 border">
-                      <AvatarImage src={task.assignee.avatar_url ?? ""} />
-                      <AvatarFallback className="bg-primary/10 text-[9px] text-primary">
-                        {initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm font-medium">
-                      {task.assignee.full_name || "Unknown"}
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-sm text-muted-foreground">
-                    Unassigned
-                  </span>
-                )}
+
+              {/* Due date */}
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <Input
+                  type="date"
+                  defaultValue={task.due_date ? task.due_date.split("T")[0] : ""}
+                  onBlur={(e) =>
+                    updateField({ taskId: task.id, due_date: e.target.value || null })
+                  }
+                  className="h-auto w-auto border-none bg-transparent p-0 text-sm font-medium shadow-none focus-visible:ring-0"
+                />
               </div>
+
+              {/* Assignee */}
+              <div className="ml-auto flex items-center gap-2">
+                <User className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <Select
+                  value={task.assignee_id ?? "unassigned"}
+                  onValueChange={(v) =>
+                    updateField({
+                      taskId: task.id,
+                      assignee_id: v === "unassigned" ? null : v,
+                    })
+                  }
+                >
+                  <SelectTrigger className="h-auto border-none bg-transparent p-0 shadow-none focus:ring-0 [&>svg]:ml-1 [&>svg]:opacity-50">
+                    {task.assignee ? (
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-5 w-5 border">
+                          <AvatarImage src={task.assignee.avatar_url ?? ""} />
+                          <AvatarFallback className="bg-primary/10 text-[9px] text-primary">
+                            {initials}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium">
+                          {task.assignee.full_name || "Unknown"}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">Unassigned</span>
+                    )}
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
+                    {members?.map((m) => (
+                      <SelectItem key={m.user_id} value={m.user_id}>
+                        {m.full_name || m.email}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
             </div>
           </div>
 
-          {/* ── Right panel (1/3) — Comments ── */}
+          {/* ── Right panel — Comments ── */}
           <div className="flex min-w-0 flex-col" style={{ flex: "1" }}>
-            {/* Panel header */}
             <div className="shrink-0 border-b px-4 py-3">
               <p className="text-sm font-medium">Comments</p>
             </div>
-
-            {/* Scrollable comment list */}
             <div className="flex-1 overflow-y-auto px-4 py-4">
               <CommentList
                 taskId={task.id}
@@ -229,20 +384,13 @@ export function TaskDetailsDialog({
                 currentUserRole={currentUserRole}
               />
             </div>
-
-            {/* Pinned comment input */}
             <div className="shrink-0 border-t px-4 py-3">
               <CommentInput taskId={task.id} />
             </div>
           </div>
+
         </div>
       </DialogContent>
-
-      <EditTaskDialog
-        task={task}
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-      />
     </Dialog>
   )
 }

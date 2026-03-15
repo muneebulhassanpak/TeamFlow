@@ -105,8 +105,36 @@ export function useUpdateTask(projectId: string) {
       }
       return res.json()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: taskKeys.all(projectId) })
+    onMutate: async ({ taskId, ...input }) => {
+      await queryClient.cancelQueries({ queryKey: ["tasks", projectId] })
+      const previousEntries = queryClient.getQueriesData<TaskRow[]>({
+        queryKey: ["tasks", projectId],
+      })
+      queryClient.setQueriesData<TaskRow[]>(
+        { queryKey: ["tasks", projectId] },
+        (old) =>
+          old?.map((t) =>
+            t.id === taskId
+              ? {
+                  ...t,
+                  ...input,
+                  assignee_id:
+                    input.assignee_id === "unassigned"
+                      ? null
+                      : (input.assignee_id ?? t.assignee_id),
+                }
+              : t
+          ) ?? old
+      )
+      return { previousEntries }
+    },
+    onError: (_err, _vars, context) => {
+      context?.previousEntries.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data)
+      })
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", projectId] })
     },
   })
 }

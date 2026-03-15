@@ -31,7 +31,32 @@ export function useCreateSubtask(taskId: string) {
       if (!res.ok) throw new Error(json.error ?? 'Failed to create subtask')
       return json.data as Subtask
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: subtaskKeys.byTask(taskId) }),
+    onMutate: async (input) => {
+      await queryClient.cancelQueries({ queryKey: subtaskKeys.byTask(taskId) })
+      const previous = queryClient.getQueryData<Subtask[]>(subtaskKeys.byTask(taskId))
+      const tempSubtask: Subtask = {
+        id: `temp-${Date.now()}`,
+        task_id: taskId,
+        org_id: '',
+        created_by: '',
+        title: input.title,
+        completed: false,
+        position: (previous?.length ?? 0) + 1,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+      queryClient.setQueryData<Subtask[]>(subtaskKeys.byTask(taskId), (old) => [
+        ...(old ?? []),
+        tempSubtask,
+      ])
+      return { previous }
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(subtaskKeys.byTask(taskId), context?.previous)
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: subtaskKeys.byTask(taskId) })
+    },
   })
 }
 
@@ -48,7 +73,20 @@ export function useUpdateSubtask(taskId: string) {
       if (!res.ok) throw new Error(json.error ?? 'Failed to update subtask')
       return json.data as Subtask
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: subtaskKeys.byTask(taskId) }),
+    onMutate: async ({ subtaskId, ...input }) => {
+      await queryClient.cancelQueries({ queryKey: subtaskKeys.byTask(taskId) })
+      const previous = queryClient.getQueryData<Subtask[]>(subtaskKeys.byTask(taskId))
+      queryClient.setQueryData<Subtask[]>(subtaskKeys.byTask(taskId), (old) =>
+        old?.map((s) => (s.id === subtaskId ? { ...s, ...input } : s))
+      )
+      return { previous }
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(subtaskKeys.byTask(taskId), context?.previous)
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: subtaskKeys.byTask(taskId) })
+    },
   })
 }
 
@@ -60,6 +98,19 @@ export function useDeleteSubtask(taskId: string) {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error ?? 'Failed to delete subtask')
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: subtaskKeys.byTask(taskId) }),
+    onMutate: async (subtaskId) => {
+      await queryClient.cancelQueries({ queryKey: subtaskKeys.byTask(taskId) })
+      const previous = queryClient.getQueryData<Subtask[]>(subtaskKeys.byTask(taskId))
+      queryClient.setQueryData<Subtask[]>(subtaskKeys.byTask(taskId), (old) =>
+        old?.filter((s) => s.id !== subtaskId)
+      )
+      return { previous }
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(subtaskKeys.byTask(taskId), context?.previous)
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: subtaskKeys.byTask(taskId) })
+    },
   })
 }

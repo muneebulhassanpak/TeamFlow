@@ -28,7 +28,8 @@ export function SubtaskList({ taskId }: SubtaskListProps) {
   function handleAdd() {
     const title = newTitle.trim()
     if (!title) return
-    create.mutate({ title }, { onSuccess: () => setNewTitle('') })
+    setNewTitle('')
+    create.mutate({ title })
   }
 
   const completed = subtasks?.filter((s) => s.completed).length ?? 0
@@ -73,7 +74,6 @@ export function SubtaskList({ taskId }: SubtaskListProps) {
           onBlur={handleAdd}
           placeholder="Add subtask…"
           className="text-muted-foreground placeholder:text-muted-foreground/60 w-full bg-transparent text-sm outline-none"
-          disabled={create.isPending}
         />
       </div>
     </div>
