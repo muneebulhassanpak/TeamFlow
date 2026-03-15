@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Loader2, SendHorizonal } from "lucide-react"
+import { SendHorizonal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { useCreateComment } from "../hooks/use-comments"
@@ -18,7 +18,8 @@ export function CommentInput({ taskId }: CommentInputProps) {
     e.preventDefault()
     const trimmed = body.trim()
     if (!trimmed) return
-    create.mutate({ body: trimmed }, { onSuccess: () => setBody("") })
+    setBody("")
+    create.mutate({ body: trimmed })
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -37,20 +38,15 @@ export function CommentInput({ taskId }: CommentInputProps) {
         placeholder="Write a comment… (⌘↵)"
         rows={1}
         className="flex-1 resize-none text-sm h-9 py-2 min-h-0"
-        disabled={create.isPending}
       />
       <Button
         type="submit"
         size="icon"
-        disabled={!body.trim() || create.isPending}
+        disabled={!body.trim()}
         className="shrink-0"
         title="Submit comment"
       >
-        {create.isPending ? (
-          <Loader2 className="size-4 animate-spin" />
-        ) : (
-          <SendHorizonal className="size-4" />
-        )}
+        <SendHorizonal className="size-4" />
       </Button>
     </form>
   )

@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { commentKeys } from '@/lib/query-keys'
+import { createClient } from '@/lib/supabase/client'
 import type { TaskCommentWithAuthor } from '@/types'
 import type { CreateCommentInput, UpdateCommentInput } from '../validations/comments'
 
@@ -31,7 +32,44 @@ export function useCreateComment(taskId: string) {
       if (!res.ok) throw new Error(json.error ?? 'Failed to post comment')
       return json.data as TaskCommentWithAuthor
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: commentKeys.byTask(taskId) }),
+    onMutate: async (input) => {
+      // Get session from cache — essentially instant, already in memory
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      const userId = session?.user.id ?? ''
+      const meta = session?.user.user_metadata ?? {}
+
+      await queryClient.cancelQueries({ queryKey: commentKeys.byTask(taskId) })
+      const previous = queryClient.getQueryData<TaskCommentWithAuthor[]>(commentKeys.byTask(taskId))
+
+      const tempComment: TaskCommentWithAuthor = {
+        id: `temp-${Date.now()}`,
+        task_id: taskId,
+        org_id: '',
+        author_id: userId,
+        body: input.body,
+        edited_at: null,
+        created_at: new Date().toISOString(),
+        author: {
+          id: userId,
+          full_name: (meta.full_name as string | null) ?? null,
+          avatar_url: (meta.avatar_url as string | null) ?? null,
+        },
+      }
+
+      queryClient.setQueryData<TaskCommentWithAuthor[]>(commentKeys.byTask(taskId), (old) => [
+        ...(old ?? []),
+        tempComment,
+      ])
+
+      return { previous }
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(commentKeys.byTask(taskId), context?.previous)
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: commentKeys.byTask(taskId) })
+    },
   })
 }
 
@@ -48,7 +86,22 @@ export function useUpdateComment(taskId: string) {
       if (!res.ok) throw new Error(json.error ?? 'Failed to update comment')
       return json.data as TaskCommentWithAuthor
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: commentKeys.byTask(taskId) }),
+    onMutate: async ({ commentId, body }) => {
+      await queryClient.cancelQueries({ queryKey: commentKeys.byTask(taskId) })
+      const previous = queryClient.getQueryData<TaskCommentWithAuthor[]>(commentKeys.byTask(taskId))
+      queryClient.setQueryData<TaskCommentWithAuthor[]>(commentKeys.byTask(taskId), (old) =>
+        old?.map((c) =>
+          c.id === commentId ? { ...c, body, edited_at: new Date().toISOString() } : c
+        )
+      )
+      return { previous }
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(commentKeys.byTask(taskId), context?.previous)
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: commentKeys.byTask(taskId) })
+    },
   })
 }
 
@@ -60,6 +113,19 @@ export function useDeleteComment(taskId: string) {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error ?? 'Failed to delete comment')
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: commentKeys.byTask(taskId) }),
+    onMutate: async (commentId) => {
+      await queryClient.cancelQueries({ queryKey: commentKeys.byTask(taskId) })
+      const previous = queryClient.getQueryData<TaskCommentWithAuthor[]>(commentKeys.byTask(taskId))
+      queryClient.setQueryData<TaskCommentWithAuthor[]>(commentKeys.byTask(taskId), (old) =>
+        old?.filter((c) => c.id !== commentId)
+      )
+      return { previous }
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(commentKeys.byTask(taskId), context?.previous)
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: commentKeys.byTask(taskId) })
+    },
   })
 }

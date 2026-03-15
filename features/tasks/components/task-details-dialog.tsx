@@ -148,7 +148,7 @@ export function TaskDetailsDialog({
       <DialogContent
         className={cn(
           "flex h-[85vh] flex-col gap-0 overflow-hidden border-muted p-0 transition-all duration-300 [&>button:last-child]:hidden",
-          isExpanded ? "sm:max-w-[1100px]" : "sm:max-w-[900px]"
+          isExpanded ? "sm:max-w-275" : "sm:max-w-225"
         )}
       >
         <div className="sr-only">
@@ -158,7 +158,7 @@ export function TaskDetailsDialog({
         {/* Shared top bar */}
         <div className="flex shrink-0 items-center justify-between border-b px-3 py-2">
           <div className="flex items-center gap-2 px-1.5 text-xs font-medium text-muted-foreground">
-            <span className="flex items-center gap-1.5 uppercase tracking-wider">
+            <span className="flex items-center gap-1.5 tracking-wider uppercase">
               <LayoutList className="h-3.5 w-3.5" /> Task
             </span>
             <span>•</span>
@@ -190,10 +190,16 @@ export function TaskDetailsDialog({
               ) : (
                 <Maximize className="size-3.5" />
               )}
-              <span className="sr-only">{isExpanded ? "Collapse" : "Expand"}</span>
+              <span className="sr-only">
+                {isExpanded ? "Collapse" : "Expand"}
+              </span>
             </Button>
             <DialogClose asChild>
-              <Button variant="ghost" size="icon" className="size-7 text-muted-foreground">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-7 text-muted-foreground"
+              >
                 <X className="size-3.5" />
                 <span className="sr-only">Close</span>
               </Button>
@@ -203,11 +209,9 @@ export function TaskDetailsDialog({
 
         {/* Two-column layout */}
         <div className="flex min-h-0 flex-1 overflow-hidden">
-
           {/* ── Left panel ── */}
           <div className="flex min-w-0 flex-col border-r" style={{ flex: "2" }}>
             <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-6 py-6">
-
               {/* Title */}
               {editingTitle ? (
                 <Input
@@ -216,16 +220,22 @@ export function TaskDetailsDialog({
                   onChange={(e) => setTitleValue(e.target.value)}
                   onBlur={saveTitle}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") { e.preventDefault(); saveTitle() }
-                    if (e.key === "Escape") { e.preventDefault(); cancelTitle() }
+                    if (e.key === "Enter") {
+                      e.preventDefault()
+                      saveTitle()
+                    }
+                    if (e.key === "Escape") {
+                      e.preventDefault()
+                      cancelTitle()
+                    }
                   }}
-                  className="text-2xl font-semibold h-auto border-none px-0 shadow-none focus-visible:ring-0 leading-snug tracking-tight"
+                  className="h-auto border-none px-0 text-2xl leading-snug font-semibold tracking-tight shadow-none focus-visible:ring-0"
                   disabled={update.isPending}
                 />
               ) : (
                 <DialogTitle
                   onClick={() => setEditingTitle(true)}
-                  className="cursor-text rounded px-0 text-2xl font-semibold leading-snug tracking-tight text-foreground hover:bg-muted/40 transition-colors -mx-1 px-1"
+                  className="-mx-1 cursor-text rounded px-1 text-2xl leading-snug font-semibold tracking-tight text-foreground transition-colors hover:bg-muted/40"
                 >
                   {task.title}
                 </DialogTitle>
@@ -239,23 +249,26 @@ export function TaskDetailsDialog({
                   onChange={(e) => setDescValue(e.target.value)}
                   onBlur={saveDesc}
                   onKeyDown={(e) => {
-                    if (e.key === "Escape") { e.preventDefault(); cancelDesc() }
+                    if (e.key === "Escape") {
+                      e.preventDefault()
+                      cancelDesc()
+                    }
                   }}
                   placeholder="Add a description…"
-                  className="min-h-[80px] resize-none text-sm border-none px-0 shadow-none focus-visible:ring-0"
+                  className="min-h-20 resize-none border-none px-0 text-sm shadow-none focus-visible:ring-0"
                   disabled={update.isPending}
                 />
               ) : (
                 <div
                   onClick={() => setEditingDesc(true)}
-                  className="cursor-text rounded -mx-1 px-1 py-1 hover:bg-muted/40 transition-colors"
+                  className="-mx-1 cursor-text rounded px-1 py-1 transition-colors hover:bg-muted/40"
                 >
                   {task.description ? (
                     <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/80">
                       {task.description}
                     </p>
                   ) : (
-                    <p className="text-sm italic text-muted-foreground">
+                    <p className="text-sm text-muted-foreground italic">
                       Add a description…
                     </p>
                   )}
@@ -268,14 +281,16 @@ export function TaskDetailsDialog({
 
             {/* Properties footer */}
             <div className="flex shrink-0 flex-wrap items-center gap-4 border-t bg-muted/30 px-6 py-3">
-
               {/* Status */}
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <Select
                   value={task.status}
                   onValueChange={(v) =>
-                    updateField({ taskId: task.id, status: v as TaskRow["status"] })
+                    updateField({
+                      taskId: task.id,
+                      status: v as TaskRow["status"],
+                    })
                   }
                 >
                   <SelectTrigger className="h-auto border-none bg-transparent p-0 text-sm font-medium shadow-none focus:ring-0 [&>svg]:ml-1 [&>svg]:opacity-50">
@@ -296,13 +311,19 @@ export function TaskDetailsDialog({
                 <Select
                   value={task.priority}
                   onValueChange={(v) =>
-                    updateField({ taskId: task.id, priority: v as TaskRow["priority"] })
+                    updateField({
+                      taskId: task.id,
+                      priority: v as TaskRow["priority"],
+                    })
                   }
                 >
                   <SelectTrigger className="h-auto border-none bg-transparent p-0 shadow-none focus:ring-0 [&>svg]:ml-1 [&>svg]:opacity-50">
                     <Badge
                       variant="outline"
-                      className={cn("font-normal pointer-events-none", priorityConfig[task.priority].color)}
+                      className={cn(
+                        "pointer-events-none font-normal",
+                        priorityConfig[task.priority].color
+                      )}
                     >
                       {priorityConfig[task.priority].label}
                     </Badge>
@@ -321,9 +342,14 @@ export function TaskDetailsDialog({
                 <CalendarIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <Input
                   type="date"
-                  defaultValue={task.due_date ? task.due_date.split("T")[0] : ""}
+                  defaultValue={
+                    task.due_date ? task.due_date.split("T")[0] : ""
+                  }
                   onBlur={(e) =>
-                    updateField({ taskId: task.id, due_date: e.target.value || null })
+                    updateField({
+                      taskId: task.id,
+                      due_date: e.target.value || null,
+                    })
                   }
                   className="h-auto w-auto border-none bg-transparent p-0 text-sm font-medium shadow-none focus-visible:ring-0"
                 />
@@ -355,7 +381,9 @@ export function TaskDetailsDialog({
                         </span>
                       </div>
                     ) : (
-                      <span className="text-sm text-muted-foreground">Unassigned</span>
+                      <span className="text-sm text-muted-foreground">
+                        Unassigned
+                      </span>
                     )}
                   </SelectTrigger>
                   <SelectContent>
@@ -368,7 +396,6 @@ export function TaskDetailsDialog({
                   </SelectContent>
                 </Select>
               </div>
-
             </div>
           </div>
 
@@ -388,7 +415,6 @@ export function TaskDetailsDialog({
               <CommentInput taskId={task.id} />
             </div>
           </div>
-
         </div>
       </DialogContent>
     </Dialog>
