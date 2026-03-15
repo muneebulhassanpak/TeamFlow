@@ -130,20 +130,20 @@ export function TaskDetailsDialog({
                     if (e.key === "Enter") { e.preventDefault(); saveTitle() }
                     if (e.key === "Escape") { e.preventDefault(); cancelTitle() }
                   }}
-                  className="h-auto border-none px-0 py-0 text-2xl font-bold leading-snug tracking-tight shadow-none focus-visible:ring-0"
+                  className="h-auto rounded-md border-none bg-muted/50 px-2 py-1 text-2xl font-bold leading-snug tracking-tight shadow-none focus-visible:ring-0"
                   disabled={isUpdating}
                 />
               ) : (
                 <DialogTitle
                   onClick={() => setEditingTitle(true)}
-                  className="-mx-1 cursor-text rounded px-1 text-2xl font-bold leading-snug tracking-tight transition-colors hover:bg-muted/40"
+                  className="cursor-text rounded-md px-2 py-1 text-2xl font-bold leading-snug tracking-tight transition-colors hover:bg-muted/40"
                 >
                   {task.title}
                 </DialogTitle>
               )}
 
               {/* Properties — labeled grid */}
-              <div className="grid grid-cols-4 gap-3">
+              <div className={cn("grid gap-3", isExpanded ? "grid-cols-4" : "grid-cols-2")}>
                 <div className="flex flex-col gap-1.5">
                   <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Status</span>
                   <Select
@@ -226,13 +226,13 @@ export function TaskDetailsDialog({
                       if (e.key === "Escape") { e.preventDefault(); cancelDesc() }
                     }}
                     placeholder="Add a description…"
-                    className="min-h-20 resize-none border-none px-0 text-sm shadow-none focus-visible:ring-0"
+                    className="min-h-20 resize-none rounded-md border-none bg-muted/50 px-2 py-1.5 text-sm shadow-none focus-visible:ring-0"
                     disabled={isUpdating}
                   />
                 ) : (
                   <div
                     onClick={() => setEditingDesc(true)}
-                    className="-mx-1 min-h-20 cursor-text rounded px-1 py-1 transition-colors hover:bg-muted/40"
+                    className="min-h-20 cursor-text rounded-md px-2 py-1.5 transition-colors hover:bg-muted/40"
                   >
                     {task.description ? (
                       <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/80">
