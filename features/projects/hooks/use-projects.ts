@@ -83,6 +83,7 @@ export function useProjectMembers(projectId: string) {
         avatar_url: string | null
       }>
     },
+    enabled: !!projectId,
   })
 }
 
