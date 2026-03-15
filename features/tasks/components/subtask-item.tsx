@@ -1,7 +1,6 @@
 'use client'
 
-import * as React from 'react'
-import { Trash2 } from 'lucide-react'
+import { X } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
 import type { Subtask } from '@/types'
@@ -14,7 +13,7 @@ interface SubtaskItemProps {
 
 export function SubtaskItem({ subtask, onToggle, onDelete }: SubtaskItemProps) {
   return (
-    <div className="group flex items-center gap-2.5 rounded-md px-1 py-1 hover:bg-muted/50">
+    <div className="group flex items-center gap-3 rounded-md border bg-background px-3 py-2.5 transition-colors hover:bg-muted/30">
       <Checkbox
         checked={subtask.completed}
         onCheckedChange={(checked) => onToggle(subtask.id, checked as boolean)}
@@ -30,10 +29,10 @@ export function SubtaskItem({ subtask, onToggle, onDelete }: SubtaskItemProps) {
       </span>
       <button
         onClick={() => onDelete(subtask.id)}
-        className="text-muted-foreground hover:text-destructive invisible shrink-0 transition-colors group-hover:visible"
+        className="shrink-0 text-muted-foreground/50 transition-colors hover:text-destructive opacity-0 group-hover:opacity-100"
         aria-label="Delete subtask"
       >
-        <Trash2 className="size-3.5" />
+        <X className="size-3.5" />
       </button>
     </div>
   )

@@ -24,22 +24,20 @@ export function SubtaskList({ taskId }: SubtaskListProps) {
   } = useSubtaskList(taskId)
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium">
-          Subtasks
-          {total > 0 && (
-            <span className="text-muted-foreground ml-1.5 text-xs font-normal">
-              {completed}/{total}
-            </span>
-          )}
-        </h4>
+        <h4 className="text-sm font-semibold">Subtasks</h4>
+        {total > 0 && (
+          <span className="text-xs text-muted-foreground">
+            {completed} / {total} Completed
+          </span>
+        )}
       </div>
 
       {isLoading ? (
         <SubtaskListSkeleton />
       ) : (
-        <div className="space-y-0.5">
+        <div className="space-y-2">
           {subtasks?.map((subtask) => (
             <SubtaskItem
               key={subtask.id}
@@ -51,8 +49,8 @@ export function SubtaskList({ taskId }: SubtaskListProps) {
         </div>
       )}
 
+      {/* Add subtask */}
       <div className="flex items-center gap-2 pt-1">
-        <Plus className="text-muted-foreground size-3.5 shrink-0" />
         <input
           type="text"
           value={newTitle}
@@ -60,18 +58,31 @@ export function SubtaskList({ taskId }: SubtaskListProps) {
           onKeyDown={handleKeyDown}
           onBlur={handleAdd}
           placeholder="Add subtask…"
-          className="text-muted-foreground placeholder:text-muted-foreground/60 w-full bg-transparent text-sm outline-none"
+          className="w-full bg-transparent text-sm text-muted-foreground outline-none placeholder:text-muted-foreground/60"
         />
       </div>
+      {!newTitle && (
+        <button
+          type="button"
+          onClick={() => {
+            const el = document.querySelector<HTMLInputElement>(`input[placeholder="Add subtask…"]`)
+            el?.focus()
+          }}
+          className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+        >
+          <Plus className="size-3.5" />
+          Add subtask
+        </button>
+      )}
     </div>
   )
 }
 
 export function SubtaskListSkeleton() {
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="flex items-center gap-2.5 px-1 py-1">
+        <div key={i} className="flex items-center gap-3 rounded-md border px-3 py-2.5">
           <Skeleton className="size-4 rounded" />
           <Skeleton className="h-4 flex-1" />
         </div>
